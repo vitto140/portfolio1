@@ -1,0 +1,38 @@
+:root {
+  /* Colour */
+  --color-bg: #F2F3F5;
+  --color-surface: #FFFFFF;
+  --color-ink: #121417;
+  --color-muted: #565B66;
+  --color-line: #D5D8DE;
+  --color-accent: #2E46F0;
+  --color-accent-soft: #E3E7FD;
+
+  /* Font families (loaded in BaseLayout) */
+  --font-sans: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Fluid type scale: 16px base, ratio 1.25 at 320px -> 18px base, ratio 1.333 at 1400px */
+  --step--1: clamp(0.8rem, 0.787rem + 0.065vw, 0.844rem);
+  --step-0: clamp(1rem, 0.963rem + 0.185vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.176rem + 0.37vw, 1.5rem);
+  --step-2: clamp(1.5625rem, 1.433rem + 0.648vw, 2rem);
+  --step-3: clamp(1.953rem, 1.742rem + 1.056vw, 2.665rem);
+  --step-4: clamp(2.441rem, 2.112rem + 1.646vw, 3.553rem);
+
+  /* Fluid spacing: value at 320px -> 1.125x that value at 1400px */
+  --space-2xs: clamp(0.25rem, 0.241rem + 0.046vw, 0.28125rem);
+  --space-xs: clamp(0.5rem, 0.481rem + 0.093vw, 0.5625rem);
+  --space-s: clamp(1rem, 0.963rem + 0.185vw, 1.125rem);
+  --space-m: clamp(1.5rem, 1.444rem + 0.278vw, 1.6875rem);
+  --space-l: clamp(2rem, 1.926rem + 0.37vw, 2.25rem);
+  --space-xl: clamp(3rem, 2.889rem + 0.556vw, 3.375rem);
+  --space-2xl: clamp(5rem, 4.815rem + 0.926vw, 5.625rem);
+
+  /* Radius */
+  --radius-s: 0.25rem;
+  --radius-pill: 999rem;
+
+  /* Layout */
+  --container: 70rem;
+}
