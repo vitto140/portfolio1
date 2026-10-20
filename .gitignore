@@ -2,7 +2,7 @@
 dist/
 # generated types
 .astro/
-.playwright/
+.playwright-mcp/
 git add .gitignore
 # dependencies
 node_modules/
