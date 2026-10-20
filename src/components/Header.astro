@@ -1,0 +1,57 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+
+const links = [{ path: '', label: 'Home' }];
+
+// Compare paths without trailing slashes so /portfolio1 and /portfolio1/ match
+const normalize = (path: string) => path.replace(/\/+$/, '') || '/';
+const currentPath = normalize(Astro.url.pathname);
+---
+
+<header>
+	<nav class="wrapper" aria-label="Primary">
+		<ul>
+			{
+				links.map(({ path, label }) => {
+					const href = `${base}${path}`;
+					const isCurrent = normalize(href) === currentPath;
+					return (
+						<li>
+							<a href={href} aria-current={isCurrent ? 'page' : undefined}>
+								{label}
+							</a>
+						</li>
+					);
+				})
+			}
+		</ul>
+	</nav>
+</header>
+
+<style>
+	header {
+		background-color: var(--color-surface);
+		border-block-end: 0.0625rem solid var(--color-line);
+		padding-block: var(--space-s);
+	}
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-m);
+		padding: 0;
+		list-style: none;
+	}
+
+	a {
+		color: var(--color-ink);
+		text-decoration: none;
+	}
+
+	a[aria-current='page'] {
+		text-decoration: underline;
+		text-decoration-color: var(--color-accent);
+		text-decoration-thickness: 0.125rem;
+		text-underline-offset: 0.25rem;
+	}
+</style>
