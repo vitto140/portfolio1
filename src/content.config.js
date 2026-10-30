@@ -29,4 +29,15 @@ const works = defineCollection({
 		}),
 });
 
-export const collections = { socials, works };
+const passions = defineCollection({
+	loader: glob({ pattern: '**/*.md', base: './src/data/passions' }),
+	schema: ({ image }) =>
+		z.object({
+			title: z.string(),
+			summary: z.string(),
+			cover: image(),
+			coverAlt: z.string(),
+		}),
+});
+
+export const collections = { socials, works, passions };
