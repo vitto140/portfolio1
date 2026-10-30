@@ -1,0 +1,50 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import WorkCard from '../../components/WorkCard.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const works = (await getCollection('works')).sort((a, b) => b.data.year - a.data.year);
+---
+
+<BaseLayout
+	title="Works"
+	description="Projects by Vittoria Romano, web development student: the brief, how each was built and what I'd change."
+>
+	<h1>Works</h1>
+	<p class="count">{works.length} projects</p>
+	<p>A selection of projects from class and from my own time, newest first.</p>
+	<ul>
+		{
+			works.map((work) => (
+				<li>
+					<WorkCard
+						title={work.data.title}
+						summary={work.data.summary}
+						year={work.data.year}
+						tags={work.data.tags}
+						href={`${base}works/${work.id}/`}
+					/>
+				</li>
+			))
+		}
+	</ul>
+</BaseLayout>
+
+<style>
+	.count {
+		margin-block-start: var(--space-xs);
+		font-family: var(--font-mono);
+		font-size: var(--step--1);
+		color: var(--color-muted);
+	}
+
+	ul {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+		gap: var(--space-m);
+		margin-block-start: var(--space-l);
+		padding: 0;
+		list-style: none;
+	}
+</style>
