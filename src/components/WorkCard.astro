@@ -1,0 +1,53 @@
+---
+interface Props {
+	title: string;
+	summary: string;
+	year: number;
+	tags: string[];
+	href: string;
+}
+
+const { title, summary, year, tags, href } = Astro.props;
+---
+
+<article>
+	<p class="year">{year}</p>
+	<h2><a href={href}>{title}</a></h2>
+	<p>{summary}</p>
+	<ul>
+		{tags.map((tag) => <li>{tag}</li>)}
+	</ul>
+</article>
+
+<style>
+	article {
+		display: grid;
+		gap: var(--space-xs);
+		align-content: start;
+		padding: var(--space-m);
+		background-color: var(--color-surface);
+		border: 0.0625rem solid var(--color-line);
+	}
+
+	.year {
+		font-family: var(--font-mono);
+		font-size: var(--step--1);
+		color: var(--color-muted);
+	}
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2xs);
+		padding: 0;
+		list-style: none;
+	}
+
+	li {
+		padding-block: var(--space-2xs);
+		padding-inline: var(--space-xs);
+		border-radius: var(--radius-pill);
+		background-color: var(--color-accent-soft);
+		font-size: var(--step--1);
+	}
+</style>
