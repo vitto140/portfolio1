@@ -1,7 +1,7 @@
 ---
 title: "Vite multi-page starter"
 summary: "A starter setup for multi-page sites with Vite and vanilla JavaScript."
-year: 2025
+year: 2026
 role: "Solo project"
 stack: ["Vite", "JavaScript", "CSS"]
 tags: ["tooling", "javascript"]

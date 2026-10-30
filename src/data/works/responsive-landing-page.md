@@ -1,7 +1,7 @@
 ---
 title: "Responsive landing page"
 summary: "A mobile-first landing page built with semantic HTML and fluid CSS."
-year: 2025
+year: 2026
 role: "Solo project"
 stack: ["HTML", "CSS"]
 tags: ["responsive", "css"]
