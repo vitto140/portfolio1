@@ -5,7 +5,7 @@ year: 2026
 role: "Solo project"
 stack: ["HTML", "CSS"]
 tags: ["responsive", "css"]
-cover: "./images/responsive-landing-page.webp"
+cover: "./images/responsive-landing-page.png"
 coverAlt: "Placeholder cover for Responsive landing page"
 ---
 
