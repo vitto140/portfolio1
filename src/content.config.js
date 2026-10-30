@@ -24,6 +24,8 @@ const works = defineCollection({
 			tags: z.array(z.string()),
 			cover: image(),
 			coverAlt: z.string(),
+			repo: z.url().optional(),
+			live: z.url().optional(),
 		}),
 });
 
