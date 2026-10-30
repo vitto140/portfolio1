@@ -1,9 +1,16 @@
 ---
+import { getCollection } from 'astro:content';
+import SocialLinks from './SocialLinks.astro';
+
 const year = new Date().getFullYear();
+const socials = (await getCollection('socials')).sort((a, b) => a.data.order - b.data.order);
 ---
 
 <footer>
-	<p class="wrapper">&copy; {year} VITTORIA</p>
+	<div class="wrapper">
+		<SocialLinks links={socials.map((social) => social.data)} />
+		<p>&copy; {year} VITTORIA</p>
+	</div>
 </footer>
 
 <style>
@@ -12,5 +19,10 @@ const year = new Date().getFullYear();
 		padding-block: var(--space-m);
 		color: var(--color-muted);
 		font-size: var(--step--1);
+	}
+
+	div {
+		display: grid;
+		gap: var(--space-xs);
 	}
 </style>

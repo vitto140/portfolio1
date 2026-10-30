@@ -1,0 +1,33 @@
+---
+interface Props {
+	links: { id: string; name: string; url: string }[];
+}
+
+const { links } = Astro.props;
+---
+
+<ul>
+	{
+		links.map(({ name, url }) => (
+			<li>
+				<a href={url}>{name}</a>
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-s);
+		padding: 0;
+		list-style: none;
+		font-family: var(--font-mono);
+		font-size: var(--step--1);
+	}
+
+	a {
+		color: var(--color-ink);
+	}
+</style>
