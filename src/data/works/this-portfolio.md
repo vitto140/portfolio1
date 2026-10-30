@@ -9,14 +9,19 @@ cover: "./images/this-portfolio.webp"
 coverAlt: "Placeholder cover for This portfolio"
 ---
 
-## The brief
+## Frameworks and tools
 
-[brief]
+- Astro: pages, layouts, components and content collections.
+- CSS: design tokens as custom properties, with fluid type and spacing.
+- Markdown: the content of each project page.
 
-## How I built it
+## Features
 
-[how I built it]
+- Projects and social links stored as content collections with a schema
+- A card grid that adapts to the screen without media queries
+- Optimized cover images in several sizes
+- Links that work on GitHub Pages under a sub-folder
 
-## What I'd change
+## What I learned
 
-[what I'd change]
+A schema catches mistakes in my content before the site is built. Writing my own tokens and layout rules took longer than using a framework, but now I understand every line of CSS on the site.

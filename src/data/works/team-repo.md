@@ -9,14 +9,18 @@ cover: "./images/team-repo.webp"
 coverAlt: "Placeholder cover for Team repo"
 ---
 
-## The brief
+## Frameworks and tools
 
-[brief]
+- Git: a branch for each feature and small commits with clear messages.
+- GitHub: pull requests, code reviews and issues to plan the work.
+- HTML and CSS: the pages we built together.
 
-## How I built it
+## Features
 
-[how I built it]
+- A branch and a pull request for every change
+- Reviews from a teammate before anything was merged
+- Shared naming and code style across the team
 
-## What I'd change
+## What I learned
 
-[what I'd change]
+Working in one repository with other people showed me why small branches and clear commit messages matter. I also learned how to solve merge conflicts calmly and to ask questions in a review instead of guessing.

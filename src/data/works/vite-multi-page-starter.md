@@ -9,14 +9,19 @@ cover: "./images/vite-multi-page-starter.webp"
 coverAlt: "Placeholder cover for Vite multi-page starter"
 ---
 
-## The brief
+## Frameworks and tools
 
-[brief]
+- Vite: the dev server and the production build, set up for more than one HTML page.
+- JavaScript: small modules shared between the pages.
+- CSS: one set of base styles imported into every page.
+- npm: scripts to run the dev server, build and preview.
 
-## How I built it
+## Features
 
-[how I built it]
+- Several HTML pages in one project and one build
+- Shared CSS and JavaScript between the pages
+- Fast reload while developing
 
-## What I'd change
+## What I learned
 
-[what I'd change]
+Vite is set up for one page by default, so I had to read the docs to add more entry pages. Doing it myself helped me understand what a build tool actually does with my files.

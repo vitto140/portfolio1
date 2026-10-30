@@ -9,14 +9,18 @@ cover: "./images/responsive-landing-page.webp"
 coverAlt: "Placeholder cover for Responsive landing page"
 ---
 
-## The brief
+## Frameworks and tools
 
-[brief]
+- HTML: semantic structure for the header, sections and footer.
+- CSS: layout with Flexbox and Grid, and fluid type with `clamp()`.
+- Browser DevTools: testing the page at different screen widths.
 
-## How I built it
+## Features
 
-[how I built it]
+- Mobile-first layout that works from 320px up
+- Fluid type and spacing that scale with the screen
+- Clear headings and alt text for every image
 
-## What I'd change
+## What I learned
 
-[what I'd change]
+Starting with the smallest screen made my CSS shorter, because I only added rules when the layout needed more room. I also learned to check the page with the keyboard and not only with the mouse.
