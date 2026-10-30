@@ -5,6 +5,8 @@ year: 2026
 role: "Design and development"
 stack: ["Astro", "CSS", "Markdown"]
 tags: ["astro", "css"]
+cover: "./images/this-portfolio.webp"
+coverAlt: "Placeholder cover for This portfolio"
 ---
 
 ## The brief

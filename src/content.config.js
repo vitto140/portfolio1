@@ -14,14 +14,17 @@ const socials = defineCollection({
 
 const works = defineCollection({
 	loader: glob({ pattern: '**/*.md', base: './src/data/works' }),
-	schema: z.object({
-		title: z.string(),
-		summary: z.string(),
-		year: z.number(),
-		role: z.string(),
-		stack: z.array(z.string()),
-		tags: z.array(z.string()),
-	}),
+	schema: ({ image }) =>
+		z.object({
+			title: z.string(),
+			summary: z.string(),
+			year: z.number(),
+			role: z.string(),
+			stack: z.array(z.string()),
+			tags: z.array(z.string()),
+			cover: image(),
+			coverAlt: z.string(),
+		}),
 });
 
 export const collections = { socials, works };

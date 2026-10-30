@@ -5,6 +5,8 @@ year: 2026
 role: "Team member"
 stack: ["Git", "GitHub", "HTML", "CSS"]
 tags: ["teamwork", "git"]
+cover: "./images/team-repo.webp"
+coverAlt: "Placeholder cover for Team repo"
 ---
 
 ## The brief

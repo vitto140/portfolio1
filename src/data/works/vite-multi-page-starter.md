@@ -5,6 +5,8 @@ year: 2025
 role: "Solo project"
 stack: ["Vite", "JavaScript", "CSS"]
 tags: ["tooling", "javascript"]
+cover: "./images/vite-multi-page-starter.webp"
+coverAlt: "Placeholder cover for Vite multi-page starter"
 ---
 
 ## The brief
