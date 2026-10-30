@@ -24,6 +24,8 @@ const works = (await getCollection('works')).sort((a, b) => b.data.year - a.data
 						year={work.data.year}
 						tags={work.data.tags}
 						href={`${base}works/${work.id}/`}
+						cover={work.data.cover}
+						coverAlt={work.data.coverAlt}
 					/>
 				</li>
 			))

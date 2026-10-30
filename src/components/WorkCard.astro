@@ -1,16 +1,28 @@
 ---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+
 interface Props {
 	title: string;
 	summary: string;
 	year: number;
 	tags: string[];
 	href: string;
+	cover: ImageMetadata;
+	coverAlt: string;
 }
 
-const { title, summary, year, tags, href } = Astro.props;
+const { title, summary, year, tags, href, cover, coverAlt } = Astro.props;
 ---
 
 <article>
+	<Image
+		class="cover"
+		src={cover}
+		alt={coverAlt}
+		widths={[320, 640, 960]}
+		sizes="(min-width: 70rem) 22rem, 100vw"
+	/>
 	<p class="year">{year}</p>
 	<h2><a href={href}>{title}</a></h2>
 	<p>{summary}</p>
@@ -27,6 +39,13 @@ const { title, summary, year, tags, href } = Astro.props;
 		padding: var(--space-m);
 		background-color: var(--color-surface);
 		border: 0.0625rem solid var(--color-line);
+	}
+
+	.cover {
+		inline-size: 100%;
+		block-size: auto;
+		aspect-ratio: 16 / 10;
+		object-fit: cover;
 	}
 
 	.year {
