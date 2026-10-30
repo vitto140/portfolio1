@@ -65,3 +65,7 @@ a {
   width: min(100% - 2rem, var(--container));
   margin-inline: auto;
 }
+
+.flow > * + * {
+  margin-block-start: var(--space-s);
+}
