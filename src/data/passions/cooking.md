@@ -2,7 +2,7 @@
 title: "Cooking"
 summary: "My father is a chef, and he passed his love of cooking down to me."
 cover: "./images/cooking.jpeg"
-coverAlt: "Me cooking"
+coverAlt: "Me in a white chef's jacket, plating risotto with red and green garnishes at a cooking event"
 
 ---
 ## Why I love it
