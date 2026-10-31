@@ -1,8 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
 <BaseLayout title="VITTORIA" description="Portfolio of VITTORIA.">
-	<h1>VITTORIA</h1>
-	<p>Portfolio</p>
+	<section class="flow">
+		<h1>Vittoria Romano</h1>
+		<p>I'm a web development student who builds mobile first.</p>
+		<p><a href={`${base}about/`}>About me</a></p>
+	</section>
 </BaseLayout>
