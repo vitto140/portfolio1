@@ -6,7 +6,7 @@ interface Props {
 const { links } = Astro.props;
 ---
 
-<ul>
+<ul aria-label="Social links">
 	{
 		links.map(({ name, url }) => (
 			<li>
