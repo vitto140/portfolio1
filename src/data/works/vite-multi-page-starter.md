@@ -6,7 +6,7 @@ role: "Solo project"
 stack: ["Vite", "JavaScript", "CSS"]
 tags: ["tooling", "javascript"]
 cover: "./images/vite-multi-page-starter.png"
-coverAlt: "Placeholder cover for Vite multi-page starter"
+coverAlt: "Night-themed home page titled 'Broom the Spirits Away' with a ghost logo, a starry purple sky, a large cream moon and a More button"
 ---
 
 ## Frameworks and tools

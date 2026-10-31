@@ -6,7 +6,7 @@ role: "Solo project"
 stack: ["HTML", "CSS"]
 tags: ["responsive", "css"]
 cover: "./images/responsive-landing-page.png"
-coverAlt: "Placeholder cover for Responsive landing page"
+coverAlt: "Landing page for Red Cross Flanders with a red navigation bar, the heading 'User Journey Red Cross Flanders', a Start the journey button and illustrated blood drops"
 ---
 
 ## Frameworks and tools

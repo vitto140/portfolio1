@@ -6,7 +6,7 @@ role: "Design and development"
 stack: ["Astro", "CSS", "Markdown"]
 tags: ["astro", "css"]
 cover: "./images/this-portfolio.png"
-coverAlt: "Placeholder cover for This portfolio"
+coverAlt: "Dark home page titled 'Exit Your Matrix' with a Call button, beside a pill bottle with a pixel dinosaur spilling capsules over an orange and purple glow"
 ---
 
 ## Frameworks and tools

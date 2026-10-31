@@ -6,7 +6,7 @@ role: "Team member"
 stack: ["Git", "GitHub", "HTML", "CSS"]
 tags: ["teamwork", "git"]
 cover: "./images/team-repo.png"
-coverAlt: "Placeholder cover for Team repo"
+coverAlt: "Home page of 'A healing journey through space', with a large navy heading on a cream background that fades to orange and pink, and tabs for the ideation, prototype and testing phases"
 ---
 
 ## Frameworks and tools
