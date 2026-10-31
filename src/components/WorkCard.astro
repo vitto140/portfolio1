@@ -10,9 +10,11 @@ interface Props {
 	href: string;
 	cover: ImageMetadata;
 	coverAlt: string;
+	headingLevel?: 2 | 3 | 4 | 5 | 6;
 }
 
-const { title, summary, year, tags, href, cover, coverAlt } = Astro.props;
+const { title, summary, year, tags, href, cover, coverAlt, headingLevel = 2 } = Astro.props;
+const Heading = `h${headingLevel}`;
 ---
 
 <article>
@@ -24,7 +26,7 @@ const { title, summary, year, tags, href, cover, coverAlt } = Astro.props;
 		sizes="(min-width: 70rem) 22rem, 100vw"
 	/>
 	<p class="year">{year}</p>
-	<h2><a href={href}>{title}</a></h2>
+	<Heading><a href={href}>{title}</a></Heading>
 	<p>{summary}</p>
 	<ul>
 		{tags.map((tag) => <li>{tag}</li>)}
