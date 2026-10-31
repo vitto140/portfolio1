@@ -1,14 +1,12 @@
 ---
-title: "[Passion 2]"
-summary: "[One sentence about passion 2.]"
-cover: "./images/passion-2.webp"
-coverAlt: "Placeholder cover for passion 2"
+title: "Aerospace"
+summary: "Flying, and being up in the sky in general, is something that excites me."
+coverAlt: "the view]"
+cover: "./images/passion-2.jpeg"
+
 ---
 
 ## Why I love it
-
-[A short paragraph about why you love passion 2.]
-
+Every flight still feels a bit like magic to me. I love looking down at the world from above and thinking about how much engineering it takes to keep something that heavy in the air.
 ## How it shows up in my work
-
-[A short paragraph about how passion 2 shows up in your work.]
+Aerospace is all about precision and checking everything twice. I try to bring that to my sites by testing at every screen size before I call something done.
