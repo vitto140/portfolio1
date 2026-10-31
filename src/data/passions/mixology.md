@@ -3,7 +3,7 @@
 title: "Mixology"
 summary: "A fancy word for drinking. Since I moved to Belgium, I've been exploring its huge range of beers."
 coverAlt: "belgian beers"
-cover: "./images/passion-3.jpeg"
+cover: "./images/mixology.jpeg"
 
 ---
 

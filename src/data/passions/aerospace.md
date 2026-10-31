@@ -2,7 +2,7 @@
 title: "Aerospace"
 summary: "Flying, and being up in the sky in general, is something that excites me."
 coverAlt: "the view]"
-cover: "./images/passion-2.jpeg"
+cover: "./images/aerospace.jpeg"
 
 ---
 

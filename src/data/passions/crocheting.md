@@ -1,7 +1,7 @@
 ---
 title: "Crocheting"
 summary: "Working with "
-cover: "./images/passion-4.jpeg"
+cover: "./images/crocheting.jpeg"
 coverAlt: "a monkey made with yarn"
 ---
 
