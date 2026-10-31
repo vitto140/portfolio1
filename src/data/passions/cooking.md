@@ -1,7 +1,7 @@
 ---
 title: "Cooking"
 summary: "My father is a chef, and he passed his love of cooking down to me."
-cover: "./images/passion-1.jpeg"
+cover: "./images/cooking.jpeg"
 coverAlt: "Me cooking"
 
 ---
