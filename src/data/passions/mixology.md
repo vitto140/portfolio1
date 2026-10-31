@@ -2,7 +2,7 @@
 
 title: "Mixology"
 summary: "A fancy word for drinking. Since I moved to Belgium, I've been exploring its huge range of beers."
-coverAlt: "belgian beers"
+coverAlt: "Three Belgian beers in branded glasses, Delirium among them, on a worn red wooden table in a bar"
 cover: "./images/mixology.jpeg"
 
 ---
