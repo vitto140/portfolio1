@@ -54,9 +54,13 @@ const currentPath = normalize(Astro.url.pathname);
 	}
 
 	a[aria-current='page'] {
-		text-decoration: underline;
+		text-decoration-line: underline;
 		text-decoration-color: var(--color-accent);
 		text-decoration-thickness: 0.125rem;
-		text-underline-offset: 0.25rem;
+		text-underline-offset: 0.2em;
+	}
+
+	a[aria-current='page']:hover {
+		text-decoration-thickness: 0.25rem;
 	}
 </style>
