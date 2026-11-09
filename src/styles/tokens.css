@@ -35,6 +35,8 @@
 
   /* Radius */
   --radius-s: 0.25rem;
+  --radius-m: 0.75rem;
+  --radius-l: 1.25rem;
   --radius-pill: 999rem;
 
   /* Layout */
