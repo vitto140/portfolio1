@@ -1,12 +1,16 @@
 :root {
   /* Colour */
-  --color-bg: #F2F3F5;
+  --color-bg: #FBF7F1;
   --color-surface: #FFFFFF;
-  --color-ink: #121417;
-  --color-muted: #565B66;
-  --color-line: #D5D8DE;
-  --color-accent: #2E46F0;
-  --color-accent-soft: #E3E7FD;
+  --color-ink: #24212E;
+  --color-muted: #5B5768;
+  --color-line: #DCD5EC;
+  --color-lavender: #E9E4F6;
+  --color-mint: #DFF2EC;
+  --color-peach: #FDE8E0;
+  --color-accent: #FF4F79;
+  --color-accent-strong: #D62E5B;
+  --color-accent-soft: var(--color-peach);
 
   /* Font families (loaded in BaseLayout) */
   --font-sans: 'Bricolage Grotesque', system-ui, sans-serif;
