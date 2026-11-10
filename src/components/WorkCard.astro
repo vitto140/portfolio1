@@ -39,8 +39,8 @@ const Heading = `h${headingLevel}`;
 		gap: var(--space-xs);
 		align-content: start;
 		padding: var(--space-m);
-		background-color: var(--color-surface);
-		border: 0.0625rem solid var(--color-line);
+		background-color: var(--color-sage);
+		border-radius: var(--radius-l);
 	}
 
 	.cover {
@@ -48,6 +48,7 @@ const Heading = `h${headingLevel}`;
 		block-size: auto;
 		aspect-ratio: 16 / 10;
 		object-fit: cover;
+		border-radius: var(--radius-m);
 	}
 
 	.year {
@@ -69,6 +70,7 @@ const Heading = `h${headingLevel}`;
 		padding-inline: var(--space-xs);
 		border-radius: var(--radius-pill);
 		background-color: var(--color-accent-soft);
+		color: var(--color-ink);
 		font-size: var(--step--1);
 	}
 </style>
