@@ -14,30 +14,87 @@ const currentPath = normalize(Astro.url.pathname);
 ---
 
 <header>
-	<nav class="wrapper" aria-label="Primary">
-		<ul>
-			{
-				links.map(({ path, label }) => {
-					const href = `${base}${path}`;
-					const isCurrent = normalize(href) === currentPath;
-					return (
-						<li>
-							<a href={href} aria-current={isCurrent ? 'page' : undefined}>
-								{label}
-							</a>
-						</li>
-					);
-				})
-			}
-		</ul>
-	</nav>
+	<div class="wrapper bar">
+		<nav aria-label="Primary">
+			<ul>
+				{
+					links.map(({ path, label }) => {
+						const href = `${base}${path}`;
+						const isCurrent = normalize(href) === currentPath;
+						return (
+							<li>
+								<a href={href} aria-current={isCurrent ? 'page' : undefined}>
+									{label}
+								</a>
+							</li>
+						);
+					})
+				}
+			</ul>
+		</nav>
+
+		<div class="mode" role="group" aria-label="Colour mode">
+			<button type="button" data-theme-choice="light" aria-pressed="false">
+				<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+					<circle cx="12" cy="12" r="4" />
+					<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+				</svg>
+				Light
+			</button>
+			<button type="button" data-theme-choice="dark" aria-pressed="false">
+				<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+				</svg>
+				Dark
+			</button>
+		</div>
+	</div>
 </header>
+
+<script>
+	const root = document.documentElement;
+	const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+	const buttons = document.querySelectorAll<HTMLButtonElement>('[data-theme-choice]');
+
+	// A saved choice wins; otherwise follow the system setting
+	const activeTheme = () => root.dataset.theme ?? (systemDark.matches ? 'dark' : 'light');
+
+	const syncPressed = () => {
+		buttons.forEach((button) => {
+			button.setAttribute('aria-pressed', String(button.dataset.themeChoice === activeTheme()));
+		});
+	};
+
+	buttons.forEach((button) => {
+		button.addEventListener('click', () => {
+			const theme = button.dataset.themeChoice!;
+			root.dataset.theme = theme;
+			try {
+				localStorage.setItem('theme', theme);
+			} catch {
+				// Storage blocked: the choice still applies for this page
+			}
+			syncPressed();
+		});
+	});
+
+	systemDark.addEventListener('change', syncPressed);
+	syncPressed();
+</script>
 
 <style>
 	header {
 		background-color: var(--color-sky);
 		border-block-end: 0.0625rem solid var(--color-line);
 		padding-block: var(--space-s);
+	}
+
+	.bar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-s) var(--space-m);
 	}
 
 	ul {
@@ -62,5 +119,43 @@ const currentPath = normalize(Astro.url.pathname);
 
 	a[aria-current='page']:hover {
 		text-decoration-thickness: 0.25rem;
+	}
+
+	.mode {
+		display: flex;
+		padding: var(--space-2xs);
+		border: 0.0625rem solid var(--color-line);
+		border-radius: var(--radius-pill);
+		background-color: var(--color-surface);
+	}
+
+	button {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2xs);
+		padding-block: var(--space-2xs);
+		padding-inline: var(--space-xs);
+		border: 0;
+		border-radius: var(--radius-pill);
+		background-color: transparent;
+		color: var(--color-ink);
+		font: inherit;
+		font-size: var(--step--1);
+		cursor: pointer;
+	}
+
+	button[aria-pressed='true'] {
+		background-color: var(--color-accent);
+		color: var(--color-on-pop);
+	}
+
+	/* The --color-focus ring comes from global.css; keep the pill shape while focused */
+	button:focus-visible {
+		border-radius: var(--radius-pill);
+	}
+
+	svg {
+		inline-size: 1rem;
+		block-size: 1rem;
 	}
 </style>

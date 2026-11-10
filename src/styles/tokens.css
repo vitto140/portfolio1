@@ -17,6 +17,9 @@
   --color-accent: #F7759A;
   --color-accent-strong: #C93763;
   --color-accent-soft: var(--color-blossom);
+  --color-on-pop: #23302A;
+  --color-focus: var(--color-accent-strong);
+  --color-shadow: rgb(35 48 42 / 18%);
 
   /* Font families (loaded in BaseLayout) */
   --font-sans: 'Bricolage Grotesque', system-ui, sans-serif;
@@ -47,4 +50,50 @@
 
   /* Layout */
   --container: 70rem;
+}
+
+/* Night: follows the system setting unless a button sets data-theme="light" */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-bg: #131A17;
+    --color-surface: #1C2420;
+    --color-ink: #E9EFE6;
+    --color-muted: #A8B5AC;
+    --color-line: #34453B;
+    --color-sage: #1A2520;
+    --color-blossom: #3B2833;
+    /* Night butter is decoration only (moon, flower centres), never a text background */
+    --color-butter: #F3EBC9;
+    --color-lavender: #2A2638;
+    --color-sky: #111A2A;
+    --color-hedge: #2C4033;
+    --color-hedge-deep: #20322A;
+    --color-wood: #4A3A2D;
+    --color-wood-deep: #3E3026;
+    --color-focus: var(--color-accent);
+    --color-shadow: rgb(0 0 0 / 50%);
+  }
+}
+
+/* Night: forced by a button setting data-theme="dark" */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #131A17;
+  --color-surface: #1C2420;
+  --color-ink: #E9EFE6;
+  --color-muted: #A8B5AC;
+  --color-line: #34453B;
+  --color-sage: #1A2520;
+  --color-blossom: #3B2833;
+  /* Night butter is decoration only (moon, flower centres), never a text background */
+  --color-butter: #F3EBC9;
+  --color-lavender: #2A2638;
+  --color-sky: #111A2A;
+  --color-hedge: #2C4033;
+  --color-hedge-deep: #20322A;
+  --color-wood: #4A3A2D;
+  --color-wood-deep: #3E3026;
+  --color-focus: var(--color-accent);
+  --color-shadow: rgb(0 0 0 / 50%);
 }
