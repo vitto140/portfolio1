@@ -17,7 +17,7 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 	title="Vittoria Romano"
 	description="Portfolio of Vittoria Romano, web development student: works, passions and how to reach me."
 >
-	<section class="flow">
+	<section class="hero flow">
 		<h1>Vittoria Romano</h1>
 		<p>I'm a web development student who builds mobile first.</p>
 		<p><a href={`${base}about/`}>About me</a></p>
@@ -69,6 +69,19 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 </BaseLayout>
 
 <style>
+	/* Fill the screen below the header and main's top padding.
+	   6.9rem is the header at 320px, where the Light / Dark switch wraps to a second row */
+	.hero {
+		display: grid;
+		align-content: center;
+		min-block-size: calc(100svh - 6.9rem - var(--space-xl));
+	}
+
+	.hero h1 {
+		font-size: clamp(3rem, 1.519rem + 7.407vw, 8rem);
+		line-height: 0.95;
+	}
+
 	section + section {
 		margin-block-start: var(--space-2xl);
 	}
