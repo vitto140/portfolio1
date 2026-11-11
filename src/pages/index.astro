@@ -70,11 +70,11 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 
 <style>
 	/* Fill the screen below the header and main's top padding.
-	   6.9rem is the header at 320px, where the Light / Dark switch wraps to a second row */
+	   4.8rem is the closed header at 320px: name and menu button on one row */
 	.hero {
 		display: grid;
 		align-content: center;
-		min-block-size: calc(100svh - 6.9rem - var(--space-xl));
+		min-block-size: calc(100svh - 4.8rem - var(--space-xl));
 	}
 
 	.hero h1 {
