@@ -3,12 +3,14 @@ interface Props {
 	eyebrow: string;
 	title: string;
 	lede: string;
+	/** A garden edge under the head, as decoration */
+	edge?: 'hedge';
 }
 
-const { eyebrow, title, lede } = Astro.props;
+const { eyebrow, title, lede, edge } = Astro.props;
 ---
 
-<header>
+<header class:list={[edge]}>
 	<hgroup>
 		<p class="eyebrow">{eyebrow}</p>
 		<h1>{title}</h1>
@@ -33,5 +35,18 @@ const { eyebrow, title, lede } = Astro.props;
 		max-inline-size: 40rem;
 		margin-block-start: var(--space-s);
 		font-size: var(--step-1);
+	}
+
+	/* A hedge strip under the text with a scalloped bottom: a flat 1rem band,
+	   then half circles 1.5rem wide hanging from it. CSS only, so nothing to read out */
+	.hedge::after {
+		content: '';
+		display: block;
+		block-size: 1.75rem;
+		margin-block-start: var(--space-m);
+		background:
+			linear-gradient(var(--color-hedge) 0 0) top / 100% 1rem no-repeat,
+			radial-gradient(circle at 50% 0, var(--color-hedge) 0.75rem, transparent calc(0.75rem + 0.0625rem))
+				0 1rem / 1.5rem 0.75rem repeat-x;
 	}
 </style>

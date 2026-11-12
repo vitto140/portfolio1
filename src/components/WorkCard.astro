@@ -17,30 +17,72 @@ const { title, summary, year, tags, href, cover, coverAlt, headingLevel = 2 } = 
 const Heading = `h${headingLevel}`;
 ---
 
-<article>
-	<Image
-		class="cover"
-		src={cover}
-		alt={coverAlt}
-		widths={[320, 640, 960]}
-		sizes="(min-width: 70rem) 22rem, 100vw"
-	/>
-	<p class="year">{year}</p>
-	<Heading><a href={href}>{title}</a></Heading>
-	<p>{summary}</p>
-	<ul>
-		{tags.map((tag) => <li>{tag}</li>)}
-	</ul>
+<!-- A wooden door in a hedge arch. The title link stretches over the whole door, so the card is one link -->
+<article class="arch">
+	<div class="door">
+		<Image
+			class="cover"
+			src={cover}
+			alt={coverAlt}
+			widths={[320, 640, 960]}
+			sizes="(min-width: 70rem) 22rem, 100vw"
+		/>
+		<p class="year">{year}</p>
+		<Heading><a href={href}>{title}</a></Heading>
+		<p>{summary}</p>
+		<ul>
+			{tags.map((tag) => <li>{tag}</li>)}
+		</ul>
+	</div>
 </article>
 
 <style>
-	article {
+	/* Hedge arch: a rounded top, flat at the bottom so the door stands on the ground.
+	   No text sits on the hedge: muted text on hedge is below 4.5:1 by day */
+	.arch {
+		padding-block-start: var(--space-xl);
+		padding-inline: var(--space-s);
+		background-color: var(--color-hedge);
+		border-radius: 50% 50% 0 0 / var(--space-2xl) var(--space-2xl) 0 0;
+	}
+
+	/* Wooden door: planks in wood with wood-deep seams and frame, and a gentler arch.
+	   The top padding matches the arch height, so the arch never cuts the image */
+	.door {
+		--door-radius: 50% 50% var(--radius-s) var(--radius-s) / var(--space-xl) var(--space-xl) var(--radius-s) var(--radius-s);
+
+		position: relative;
 		display: grid;
 		gap: var(--space-xs);
 		align-content: start;
-		padding: var(--space-m);
-		background-color: var(--color-sage);
-		border-radius: var(--radius-l);
+		padding: var(--space-xl) var(--space-s) var(--space-m);
+		background-color: var(--color-wood);
+		background-image: repeating-linear-gradient(
+			to right,
+			transparent 0 calc(25% - 0.0625rem),
+			var(--color-wood-deep) calc(25% - 0.0625rem) 25%
+		);
+		border: 0.375rem solid var(--color-wood-deep);
+		border-block-end: 0;
+		border-radius: var(--door-radius);
+	}
+
+	/* The link covers the whole door */
+	.door a::after {
+		content: '';
+		position: absolute;
+		inset: -0.375rem -0.375rem 0;
+		border-radius: var(--door-radius);
+	}
+
+	/* Draw the focus ring around the door instead of around the title */
+	.door a:focus-visible {
+		outline: none;
+	}
+
+	.door a:focus-visible::after {
+		outline: 0.1875rem solid var(--color-focus);
+		outline-offset: 0.1875rem;
 	}
 
 	.cover {
@@ -51,10 +93,10 @@ const Heading = `h${headingLevel}`;
 		border-radius: var(--radius-m);
 	}
 
+	/* Ink, not muted: muted on wood is 4.39:1 by day */
 	.year {
 		font-family: var(--font-mono);
 		font-size: var(--step--1);
-		color: var(--color-muted);
 	}
 
 	ul {
