@@ -267,4 +267,25 @@ const currentPath = normalize(Astro.url.pathname);
 	[hidden] {
 		display: none;
 	}
+
+	/* From 41em the nav fits on one row, so drop the menu.
+	   .panel[hidden] outranks [hidden], so the panel shows even after the script hid it */
+	@media (min-width: 41em) {
+		.menu-button {
+			display: none;
+		}
+
+		.panel,
+		.panel[hidden] {
+			display: flex;
+			flex-basis: auto;
+			align-items: center;
+			gap: var(--space-m);
+		}
+
+		ul {
+			display: flex;
+			gap: var(--space-s);
+		}
+	}
 </style>
