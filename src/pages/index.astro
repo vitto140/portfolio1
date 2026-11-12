@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import WorkCard from '../components/WorkCard.astro';
 import PassionCard from '../components/PassionCard.astro';
+import Meadow from '../components/Meadow.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const works = (await getCollection('works'))
@@ -21,6 +22,7 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 		<h1>Vittoria Romano</h1>
 		<p>I'm a web development student who builds mobile first.</p>
 		<p><a href={`${base}about/`}>About me</a></p>
+		<Meadow />
 	</section>
 
 	<section class="flow">
@@ -70,11 +72,19 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 
 <style>
 	/* Fill the screen below the header and main's top padding.
-	   4.8rem is the closed header at 320px: name and menu button on one row */
+	   4.8rem is the closed header at 320px: name and menu button on one row.
+	   The meadow sits behind the hero; the padding keeps the text above it,
+	   so the text never covers the moon or the flowers.
+	   Meadow: 9rem at 320px -> 18rem at 1400px */
 	.hero {
+		--meadow-block-size: clamp(9rem, 6.333rem + 13.333vw, 18rem);
+
+		position: relative;
+		isolation: isolate;
 		display: grid;
 		align-content: center;
 		min-block-size: calc(100svh - 4.8rem - var(--space-xl));
+		padding-block-end: var(--meadow-block-size);
 	}
 
 	.hero h1 {

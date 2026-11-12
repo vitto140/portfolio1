@@ -1,0 +1,167 @@
+---
+// Decoration only: hills, flowers and a sun that becomes a moon at night.
+// The parent needs position: relative and isolation: isolate, so the meadow sits behind its text,
+// and sets --meadow-block-size, so it can keep that much space free of text.
+
+// left and bottom in % of the meadow, size as a multiple of the base flower size
+const flowers = [
+	{ left: 6, bottom: 6, size: 1, colour: 'blossom' },
+	{ left: 17, bottom: 14, size: 0.8, colour: 'butter' },
+	{ left: 29, bottom: 4, size: 1.2, colour: 'accent' },
+	{ left: 52, bottom: 10, size: 0.9, colour: 'blossom' },
+	{ left: 68, bottom: 5, size: 1.1, colour: 'butter' },
+	{ left: 84, bottom: 12, size: 0.8, colour: 'accent' },
+];
+
+const stars = [
+	{ left: 58, top: 8 },
+	{ left: 70, top: 22 },
+	{ left: 92, top: 6 },
+];
+---
+
+<div class="meadow" aria-hidden="true">
+	<svg class="sun" viewBox="0 0 48 48">
+		<circle cx="24" cy="24" r="12" />
+		<path
+			d="M24 2v6M24 40v6M2 24h6M40 24h6M8.4 8.4l4.3 4.3M35.3 35.3l4.3 4.3M8.4 39.6l4.3-4.3M35.3 12.7l4.3-4.3"
+		/>
+	</svg>
+
+	<svg class="moon" viewBox="0 0 48 48">
+		<path d="M30 6a18 18 0 1 0 12 30A15 15 0 0 1 30 6z" />
+	</svg>
+
+	{
+		stars.map(({ left, top }) => (
+			<svg class="star" viewBox="0 0 12 12" style={`--left: ${left}%; --top: ${top}%`}>
+				<path d="M6 0l1.4 4.6L12 6l-4.6 1.4L6 12 4.6 7.4 0 6l4.6-1.4z" />
+			</svg>
+		))
+	}
+
+	<svg class="hills" viewBox="0 0 1000 200" preserveAspectRatio="none">
+		<path class="hill-back" d="M0 120C150 60 300 60 450 100S750 50 1000 90V200H0z" />
+		<path class="hill-front" d="M0 160C200 110 400 120 600 150S850 120 1000 140V200H0z" />
+	</svg>
+
+	{
+		flowers.map(({ left, bottom, size, colour }) => (
+			<svg
+				class={`flower flower-${colour}`}
+				viewBox="0 0 24 24"
+				style={`--left: ${left}%; --bottom: ${bottom}%; --size: ${size}`}
+			>
+				<circle class="petal" cx="12" cy="5" r="4.5" />
+				<circle class="petal" cx="18.7" cy="9.8" r="4.5" />
+				<circle class="petal" cx="16.1" cy="17.7" r="4.5" />
+				<circle class="petal" cx="7.9" cy="17.7" r="4.5" />
+				<circle class="petal" cx="5.3" cy="9.8" r="4.5" />
+				<circle class="centre" cx="12" cy="12" r="3.5" />
+			</svg>
+		))
+	}
+</div>
+
+<style>
+	.meadow {
+		position: absolute;
+		inset-inline: 0;
+		inset-block-end: 0;
+		z-index: -1;
+		block-size: var(--meadow-block-size);
+		pointer-events: none;
+	}
+
+	.meadow svg {
+		position: absolute;
+	}
+
+	.hills {
+		inset: 0;
+		inline-size: 100%;
+		block-size: 100%;
+	}
+
+	.hill-back {
+		fill: var(--color-hedge);
+	}
+
+	.hill-front {
+		fill: var(--color-hedge-deep);
+	}
+
+	/* Sun and moon sit in the sky on the right, above the back hill */
+	.sun,
+	.moon {
+		inset-block-start: 8%;
+		inset-inline-end: 10%;
+		inline-size: clamp(3rem, 2.259rem + 3.704vw, 5.5rem);
+	}
+
+	.sun {
+		fill: var(--color-butter);
+		stroke: var(--color-butter);
+		stroke-width: 3;
+		stroke-linecap: round;
+	}
+
+	.moon,
+	.star {
+		display: none;
+		fill: var(--color-butter);
+	}
+
+	.star {
+		inset-inline-start: var(--left);
+		inset-block-start: var(--top);
+		inline-size: clamp(0.5rem, 0.426rem + 0.37vw, 0.75rem);
+	}
+
+	.flower {
+		inset-inline-start: var(--left);
+		inset-block-end: var(--bottom);
+		inline-size: calc(var(--size) * clamp(1.25rem, 1.028rem + 1.111vw, 2rem));
+	}
+
+	.flower-blossom .petal {
+		fill: var(--color-blossom);
+	}
+
+	.flower-butter .petal {
+		fill: var(--color-butter);
+	}
+
+	.flower-accent .petal {
+		fill: var(--color-accent);
+	}
+
+	.centre {
+		fill: var(--color-butter);
+	}
+
+	.flower-butter .centre {
+		fill: var(--color-accent);
+	}
+
+	/* Night: the sun sets, the moon and stars come out */
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .sun {
+			display: none;
+		}
+
+		:global(:root:not([data-theme='light'])) .moon,
+		:global(:root:not([data-theme='light'])) .star {
+			display: block;
+		}
+	}
+
+	:global(:root[data-theme='dark']) .sun {
+		display: none;
+	}
+
+	:global(:root[data-theme='dark']) .moon,
+	:global(:root[data-theme='dark']) .star {
+		display: block;
+	}
+</style>
