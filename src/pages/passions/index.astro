@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PassionCard from '../../components/PassionCard.astro';
+import PageHead from '../../components/PageHead.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const passions = (await getCollection('passions')).sort((a, b) =>
@@ -13,8 +14,11 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 	title="Passions"
 	description="Passions of Vittoria Romano, web development student: why I love them and how they show up in my work."
 >
-	<h1>Passions</h1>
-	<p>The things I love outside of code, and how they shape the way I work.</p>
+	<PageHead
+		eyebrow="Off the screen"
+		title="Passions"
+		lede="The things I love outside of code, and how they shape the way I work."
+	/>
 	<ul>
 		{
 			passions.map((passion) => (
@@ -33,13 +37,8 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 </BaseLayout>
 
 <style>
-	h1 + p {
-		margin-block-start: var(--space-xs);
-	}
-
 	ul {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
 		gap: var(--space-m);
 		margin-block-start: var(--space-l);
 		padding: 0;

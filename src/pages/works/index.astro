@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import WorkCard from '../../components/WorkCard.astro';
+import PageHead from '../../components/PageHead.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const works = (await getCollection('works')).sort(
@@ -13,9 +14,11 @@ const works = (await getCollection('works')).sort(
 	title="Works"
 	description="Projects by Vittoria Romano, web development student: the frameworks and tools I used, the features I built and what I learned."
 >
-	<h1>Works</h1>
-	<p class="count">{works.length} projects</p>
-	<p>A selection of projects from class and from my own time, newest first.</p>
+	<PageHead
+		eyebrow={`${works.length} projects`}
+		title="Works"
+		lede="A selection of projects from class and from my own time, newest first."
+	/>
 	<ul>
 		{
 			works.map((work) => (
@@ -36,16 +39,8 @@ const works = (await getCollection('works')).sort(
 </BaseLayout>
 
 <style>
-	.count {
-		margin-block-start: var(--space-xs);
-		font-family: var(--font-mono);
-		font-size: var(--step--1);
-		color: var(--color-muted);
-	}
-
 	ul {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
 		gap: var(--space-m);
 		margin-block-start: var(--space-l);
 		padding: 0;

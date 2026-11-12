@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHead from '../components/PageHead.astro';
 ---
 
 <BaseLayout
@@ -7,11 +8,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 	description="Vittoria Romano, web development student: how I work, what I build and how to reach me."
 >
 	<div class="flow">
-		<h1>About</h1>
-		<p>
-			I'm Vittoria, a web development student. This site is where I collect the things I build in
-			class and on my own, and the things I care about away from the screen.
-		</p>
+		<PageHead
+			eyebrow="Web development student"
+			title="About"
+			lede="I'm Vittoria, a web development student. This site is where I collect the things I build in class and on my own, and the things I care about away from the screen."
+		/>
 		<p>
 			I build mobile first, starting at 320px and adding breakpoints only where the content needs
 			them. I write my own CSS with custom properties and fluid type, without frameworks, because I
