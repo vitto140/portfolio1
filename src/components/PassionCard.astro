@@ -15,27 +15,70 @@ const { title, summary, href, cover, coverAlt, headingLevel = 2 } = Astro.props;
 const Heading = `h${headingLevel}`;
 ---
 
-<article>
-	<Image
-		class="cover"
-		src={cover}
-		alt={coverAlt}
-		widths={[320, 640, 960]}
-		sizes="(min-width: 70rem) 22rem, 100vw"
-	/>
-	<Heading><a href={href}>{title}</a></Heading>
-	<p>{summary}</p>
-</article>
+<!-- A polaroid hanging from a washing line with a wooden peg. The line and peg are CSS, so nothing to read out.
+     The title link stretches over the whole polaroid, so the card is one link -->
+<div class="hanging">
+	<article class="polaroid">
+		<Image
+			class="cover"
+			src={cover}
+			alt={coverAlt}
+			widths={[320, 640, 960]}
+			sizes="(min-width: 70rem) 22rem, 100vw"
+		/>
+		<div class="caption">
+			<Heading><a href={href}>{title}</a></Heading>
+			<p>{summary}</p>
+		</div>
+	</article>
+</div>
 
 <style>
-	article {
+	/* Room above the polaroid for the line and the peg */
+	.hanging {
+		position: relative;
+		padding-block-start: 1rem;
+	}
+
+	/* The washing line */
+	.hanging::before {
+		content: '';
+		position: absolute;
+		inset-inline: 0;
+		inset-block-start: 0.5rem;
+		border-block-start: 0.1875rem solid var(--color-wood-deep);
+	}
+
+	/* The peg: drawn after the polaroid, so it clips over the top of the frame */
+	.hanging::after {
+		content: '';
+		position: absolute;
+		inset-block-start: 0;
+		inset-inline-start: 50%;
+		inline-size: 0.75rem;
+		block-size: 1.75rem;
+		translate: -50% 0;
+		background-color: var(--color-wood);
+		border: 0.125rem solid var(--color-wood-deep);
+		border-radius: var(--radius-s);
+	}
+
+	/* Light frame, with the wide bottom edge of a polaroid under the caption.
+	   It turns around the peg, tilting left and right in turn */
+	.polaroid {
+		position: relative;
 		display: grid;
-		gap: var(--space-xs);
-		align-content: start;
-		padding: var(--space-m);
+		gap: var(--space-s);
+		padding: var(--space-s) var(--space-s) var(--space-l);
 		background-color: var(--color-surface);
 		box-shadow: 0 0.25rem 1rem var(--color-shadow);
-		border-radius: var(--radius-l);
+		border-radius: var(--radius-s);
+		transform-origin: 50% 0;
+		rotate: -1.5deg;
+	}
+
+	:global(li:nth-child(even)) > .hanging > .polaroid {
+		rotate: 1.5deg;
 	}
 
 	.cover {
@@ -43,5 +86,28 @@ const Heading = `h${headingLevel}`;
 		block-size: auto;
 		aspect-ratio: 16 / 10;
 		object-fit: cover;
+	}
+
+	.caption {
+		display: grid;
+		gap: var(--space-xs);
+	}
+
+	/* The link covers the whole polaroid */
+	.caption a::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: var(--radius-s);
+	}
+
+	/* Draw the focus ring around the polaroid instead of around the title */
+	.caption a:focus-visible {
+		outline: none;
+	}
+
+	.caption a:focus-visible::after {
+		outline: 0.1875rem solid var(--color-focus);
+		outline-offset: 0.1875rem;
 	}
 </style>

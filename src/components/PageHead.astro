@@ -5,12 +5,14 @@ interface Props {
 	lede: string;
 	/** A garden edge under the head, as decoration */
 	edge?: 'hedge';
+	/** A coloured sky behind the head: sunny by day, dusk at night */
+	sky?: 'sunny';
 }
 
-const { eyebrow, title, lede, edge } = Astro.props;
+const { eyebrow, title, lede, edge, sky } = Astro.props;
 ---
 
-<header class:list={[edge]}>
+<header class:list={[edge, sky]}>
 	<hgroup>
 		<p class="eyebrow">{eyebrow}</p>
 		<h1>{title}</h1>
@@ -48,5 +50,24 @@ const { eyebrow, title, lede, edge } = Astro.props;
 			linear-gradient(var(--color-hedge) 0 0) top / 100% 1rem no-repeat,
 			radial-gradient(circle at 50% 0, var(--color-hedge) 0.75rem, transparent calc(0.75rem + 0.0625rem))
 				0 1rem / 1.5rem 0.75rem repeat-x;
+	}
+
+	/* Sunny by day. Muted on butter is 5.51:1 */
+	.sunny {
+		padding: var(--space-m);
+		background: var(--color-butter);
+		border-radius: var(--radius-l);
+	}
+
+	/* Dusk at night: night butter is too light for text, so lavender fading to blossom.
+	   Muted is 6.89:1 on lavender and 6.42:1 on blossom */
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .sunny {
+			background: linear-gradient(var(--color-lavender), var(--color-blossom));
+		}
+	}
+
+	:global(:root[data-theme='dark']) .sunny {
+		background: linear-gradient(var(--color-lavender), var(--color-blossom));
 	}
 </style>
