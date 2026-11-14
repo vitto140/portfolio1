@@ -17,17 +17,24 @@ const { links } = Astro.props;
 </ul>
 
 <style>
+	/* The links get 0.25rem of padding on each side to be at least 2.75rem wide,
+	   so the list moves back and the gap shrinks by the same: the words stay where they were */
 	ul {
 		display: flex;
 		flex-wrap: wrap;
-		gap: var(--space-s);
+		gap: calc(var(--space-s) - 0.5rem);
+		margin-inline: -0.25rem;
 		padding: 0;
 		list-style: none;
 		font-family: var(--font-mono);
 		font-size: var(--step--1);
 	}
 
+	/* Touch targets: padding grows each link to 2.75rem high (1lh is its own line height) */
 	a {
+		display: inline-block;
+		padding-block: calc((2.75rem - 1lh) / 2);
+		padding-inline: 0.25rem;
 		color: var(--color-ink);
 	}
 </style>

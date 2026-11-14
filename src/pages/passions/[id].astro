@@ -17,7 +17,7 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
 <BaseLayout title={passion.data.title} description={passion.data.summary}>
-	<p><a href={`${base}passions/`}>← All passions</a></p>
+	<p><a class="back" href={`${base}passions/`}>← All passions</a></p>
 	<h1>{passion.data.title}</h1>
 	<p class="summary">{passion.data.summary}</p>
 	<Image
@@ -33,6 +33,12 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 </BaseLayout>
 
 <style>
+	/* Touch target: padding grows the back link to 2.75rem high (1lh is its own line height) */
+	.back {
+		display: inline-block;
+		padding-block: calc((2.75rem - 1lh) / 2);
+	}
+
 	h1 {
 		margin-block-start: var(--space-s);
 	}

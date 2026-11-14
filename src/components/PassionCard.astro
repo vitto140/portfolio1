@@ -15,33 +15,109 @@ const { title, summary, href, cover, coverAlt, headingLevel = 2 } = Astro.props;
 const Heading = `h${headingLevel}`;
 ---
 
-<article>
-	<Image
-		class="cover"
-		src={cover}
-		alt={coverAlt}
-		widths={[320, 640, 960]}
-		sizes="(min-width: 70rem) 22rem, 100vw"
-	/>
-	<Heading><a href={href}>{title}</a></Heading>
-	<p>{summary}</p>
+<!-- A pegged polaroid from the garden design: a wooden peg, a light frame, a square photo and the caption.
+     The peg is decoration only. The title link stretches over the whole polaroid, so the card is one link -->
+<article class="polaroid">
+	<span class="peg" aria-hidden="true"></span>
+	<div class="face">
+		<Image
+			class="cover"
+			src={cover}
+			alt={coverAlt}
+			widths={[320, 640, 960]}
+			sizes="(min-width: 72rem) 14.25rem, (min-width: 64em) calc(25vw - 3.75rem), (min-width: 36em) calc(50vw - 3.5rem), calc(100vw - 3.5rem)"
+		/>
+		<Heading class="title"><a href={href}>{title}</a></Heading>
+		<p>{summary}</p>
+	</div>
 </article>
 
 <style>
-	article {
+	/* Each polaroid turns around its peg, tilting a different way in a repeating set of four */
+	.polaroid {
+		position: relative;
+		transform-origin: 50% 0;
+		rotate: -2deg;
+	}
+
+	:global(li:nth-child(4n + 2)) > .polaroid {
+		rotate: 1.5deg;
+	}
+
+	:global(li:nth-child(4n + 3)) > .polaroid {
+		rotate: -1deg;
+	}
+
+	:global(li:nth-child(4n + 4)) > .polaroid {
+		rotate: 2.2deg;
+	}
+
+	.peg {
+		position: absolute;
+		inset-block-start: -1.1rem;
+		inset-inline-start: 50%;
+		z-index: 2;
+		inline-size: 0.8rem;
+		block-size: 2.2rem;
+		translate: -50% 0;
+		border-radius: 0.2rem;
+		background-color: var(--color-wood-deep);
+		pointer-events: none;
+	}
+
+	/* The light frame with a hairline edge in ink */
+	.face {
 		display: grid;
-		gap: var(--space-xs);
+		gap: 0.6rem;
 		align-content: start;
-		padding: var(--space-m);
+		padding: 0.75rem 0.75rem 1rem;
+		border-radius: 0.25rem;
 		background-color: var(--color-surface);
-		box-shadow: 0 0.25rem 1rem var(--color-shadow);
-		border-radius: var(--radius-l);
+		box-shadow:
+			0 0.8rem 1.6rem -0.8rem var(--color-shadow),
+			0 0 0 0.0625rem color-mix(in srgb, var(--color-ink) 10%, transparent);
 	}
 
 	.cover {
 		inline-size: 100%;
 		block-size: auto;
-		aspect-ratio: 16 / 10;
+		aspect-ratio: 1;
 		object-fit: cover;
+		border-radius: 0.125rem;
+	}
+
+	.title {
+		font-size: var(--step-1);
+		font-weight: 700;
+	}
+
+	.title a {
+		text-decoration: none;
+	}
+
+	/* The link covers the whole polaroid */
+	.title a::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+	}
+
+	/* Draw the focus ring around the frame instead of around the title */
+	.title a:focus-visible {
+		outline: none;
+	}
+
+	/* The ring sits on its own layer over the frame, above the peg (z-index 2) and the rope,
+	   so none of it is hidden. Clicks pass through it to the link */
+	.polaroid:has(.title a:focus-visible)::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		border-radius: 0.25rem;
+		outline: 0.1875rem solid var(--color-focus);
+		outline-offset: 0.1875rem;
+		pointer-events: none;
 	}
 </style>

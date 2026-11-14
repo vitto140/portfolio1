@@ -1,0 +1,112 @@
+---
+// Decoration only: the meadow at the bottom of the home hero, copied from the garden design.
+// Back hill, 26 flowers, front hill and a strip of grass, stretched to the full width.
+// The design draws it with a seeded random generator, so the same seed gives the same flowers.
+
+let seed = 7;
+const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+const round = (n: number) => Math.round(n * 100) / 100;
+
+const colours = ['accent', 'blossom', 'butter', 'lavender', 'surface'];
+const base = 240;
+
+const flowers = Array.from({ length: 26 }, (_, i) => {
+	const x = 20 + i * 45 + rnd() * 20;
+	const h = 50 + rnd() * 90;
+	const bend = x + (rnd() * 16 - 8);
+	const colour = colours[i % 5 === 0 ? 0 : 1 + Math.floor(rnd() * 4)];
+	const r = 6 + rnd() * 4;
+	const top = base - h;
+	const leafY = base - h * 0.45;
+
+	return {
+		stem: `M${round(x)} ${base}Q${round(bend)} ${round(base - h / 2)} ${round(x)} ${round(top)}`,
+		leaf: { cx: round(x + 7), cy: round(leafY), transform: `rotate(-30 ${round(x + 7)} ${round(leafY)})` },
+		colour,
+		centre: colour === 'butter' ? 'accent' : 'butter',
+		petals: Array.from({ length: 5 }, (_, p) => {
+			const a = (p / 5) * Math.PI * 2;
+			return { cx: round(x + Math.cos(a) * r), cy: round(top + Math.sin(a) * r) };
+		}),
+		petalR: round(r * 0.8),
+		centreR: round(r * 0.55),
+		x: round(x),
+		top: round(top),
+	};
+});
+---
+
+<div class="meadow" aria-hidden="true">
+	<svg viewBox="0 0 1200 240" preserveAspectRatio="none">
+		<path class="hill-back" d="M0 150C200 95 380 170 600 120S1000 90 1200 135L1200 240L0 240Z" />
+		{
+			flowers.map((f) => (
+				<g>
+					<path class="stem" d={f.stem} />
+					<ellipse class="leaf" cx={f.leaf.cx} cy={f.leaf.cy} rx="8" ry="3.5" transform={f.leaf.transform} />
+					{f.petals.map((p) => (
+						<circle class={f.colour} cx={p.cx} cy={p.cy} r={f.petalR} />
+					))}
+					<circle class={f.centre} cx={f.x} cy={f.top} r={f.centreR} />
+				</g>
+			))
+		}
+		<path class="hill-front" d="M0 195C250 170 450 215 700 190S1050 175 1200 200L1200 240L0 240Z" />
+		<path class="grass" d="M0 222C300 205 600 235 900 215S1150 225 1200 222L1200 240L0 240Z" />
+	</svg>
+</div>
+
+<style>
+	.meadow {
+		position: absolute;
+		inset-inline: 0;
+		inset-block-end: 0;
+		z-index: 1;
+		block-size: 15rem;
+		pointer-events: none;
+	}
+
+	svg {
+		inline-size: 100%;
+		block-size: 100%;
+	}
+
+	.hill-back {
+		fill: var(--color-hedge);
+	}
+
+	.hill-front,
+	.leaf {
+		fill: var(--color-hedge-deep);
+	}
+
+	.grass {
+		fill: var(--color-sage);
+	}
+
+	.stem {
+		fill: none;
+		stroke: var(--color-hedge-deep);
+		stroke-width: 3;
+	}
+
+	.accent {
+		fill: var(--color-accent);
+	}
+
+	.blossom {
+		fill: var(--color-blossom);
+	}
+
+	.butter {
+		fill: var(--color-butter);
+	}
+
+	.lavender {
+		fill: var(--color-lavender);
+	}
+
+	.surface {
+		fill: var(--color-surface);
+	}
+</style>

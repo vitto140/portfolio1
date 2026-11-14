@@ -13,35 +13,79 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 <BaseLayout
 	title="Passions"
 	description="Passions of Vittoria Romano, web development student: why I love them and how they show up in my work."
+	bleed
 >
 	<PageHead
 		eyebrow="Off the screen"
 		title="Passions"
 		lede="The things I love outside of code, and how they shape the way I work."
+		sky="sunny"
 	/>
-	<ul>
-		{
-			passions.map((passion) => (
-				<li>
-					<PassionCard
-						title={passion.data.title}
-						summary={passion.data.summary}
-						href={`${base}passions/${passion.id}/`}
-						cover={passion.data.cover}
-						coverAlt={passion.data.coverAlt}
-					/>
-				</li>
-			))
-		}
-	</ul>
+	<div class="line-room">
+		<div class="rope" aria-hidden="true"></div>
+		<div class="wrapper">
+			<ul>
+				{
+					passions.map((passion) => (
+						<li>
+							<PassionCard
+								title={passion.data.title}
+								summary={passion.data.summary}
+								href={`${base}passions/${passion.id}/`}
+								cover={passion.data.cover}
+								coverAlt={passion.data.coverAlt}
+							/>
+						</li>
+					))
+				}
+			</ul>
+		</div>
+	</div>
 </BaseLayout>
 
 <style>
+	/* The washing line: blossom fading into the page under the sunny head */
+	.line-room {
+		position: relative;
+		padding-block: var(--space-xl) var(--space-2xl);
+		background: linear-gradient(180deg, var(--color-blossom), var(--color-bg) 40%);
+	}
+
+	/* The pegs reach 1.1rem above each polaroid, so the list starts lower */
 	ul {
 		display: grid;
-		gap: var(--space-m);
-		margin-block-start: var(--space-l);
-		padding: 0;
+		gap: var(--space-xl) var(--space-l);
+		padding: var(--space-l) 0 0;
 		list-style: none;
+	}
+
+	/* One rope only when all four polaroids hang in a single row */
+	.rope {
+		display: none;
+	}
+
+	/* Two side by side from 36em: one card across the full width is too wide */
+	@media (min-width: 36em) {
+		ul {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	/* Four in a row from 64em: two cards leave too much empty space.
+	   The rope runs through the pegs, sagging slightly */
+	@media (min-width: 64em) {
+		ul {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+
+		.rope {
+			display: block;
+			position: absolute;
+			inset-inline: 0;
+			inset-block-start: calc(var(--space-xl) + var(--space-l) - 0.6rem);
+			block-size: 1.5rem;
+			border-block-start: 0.1875rem solid var(--color-wood-deep);
+			border-radius: 50% / 100% 100% 0 0;
+		}
 	}
 </style>

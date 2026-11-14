@@ -3,17 +3,28 @@ interface Props {
 	eyebrow: string;
 	title: string;
 	lede: string;
+	/** The hedge wall: a hedge rising from the bottom of the head */
+	edge?: 'hedge';
+	/** The washing line: a sunny head with the sun in the corner.
+	    The greenhouse: glass panes with thin frame lines */
+	sky?: 'sunny' | 'glass';
 }
 
-const { eyebrow, title, lede } = Astro.props;
+// Both are the garden design's full-width head. They need a page with BaseLayout's bleed,
+// since the head brings its own .wrapper
+const { eyebrow, title, lede, edge, sky } = Astro.props;
+const garden = edge === 'hedge' || sky !== undefined;
 ---
 
-<header>
-	<hgroup>
-		<p class="eyebrow">{eyebrow}</p>
-		<h1>{title}</h1>
-	</hgroup>
-	<p class="lede">{lede}</p>
+<header class:list={[edge, sky, { garden }]}>
+	<div class:list={['inner', { wrapper: garden }]}>
+		<hgroup>
+			<p class="eyebrow">{eyebrow}</p>
+			<h1>{title}</h1>
+		</hgroup>
+		<p class="lede">{lede}</p>
+	</div>
+	{edge === 'hedge' && <div class="hedge-edge" aria-hidden="true"></div>}
 </header>
 
 <style>
@@ -33,5 +44,114 @@ const { eyebrow, title, lede } = Astro.props;
 		max-inline-size: 40rem;
 		margin-block-start: var(--space-s);
 		font-size: var(--step-1);
+	}
+
+	/* The garden design's page head: full width, a big title, the crumb in spaced capitals.
+	   Muted on the sky to sage gradient is at least 4.91:1 by day */
+	.garden {
+		position: relative;
+		overflow: hidden;
+		padding-block: var(--space-2xl) var(--space-xl);
+	}
+
+	/* --halo is only set at night on the sunny head: a soft edge in the night background
+	   around every letter, so the title keeps 4.5:1 where it crosses the moon */
+	.garden .inner {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		gap: var(--space-s);
+		text-shadow: var(--halo, none);
+	}
+
+	.garden hgroup {
+		gap: var(--space-s);
+	}
+
+	.garden h1 {
+		font-size: clamp(3rem, 1rem + 10vw, 8rem);
+		font-weight: 800;
+		letter-spacing: -0.045em;
+		line-height: 0.9;
+	}
+
+	.garden .eyebrow {
+		letter-spacing: 0.08em;
+	}
+
+	.garden .lede {
+		max-inline-size: 34ch;
+		margin-block-start: 0;
+		line-height: 1.35;
+	}
+
+	/* The hedge wall: sky fading to sage, with the round top of the hedge rising from the bottom.
+	   The section under the head is hedge, so the bumps join it */
+	.hedge {
+		padding-block-end: var(--space-2xl);
+		background: linear-gradient(180deg, var(--color-sky), var(--color-sage));
+	}
+
+	.hedge-edge {
+		position: absolute;
+		inset: auto 0 0 0;
+		block-size: 3rem;
+		background: radial-gradient(circle at 1.5rem 3rem, var(--color-hedge) 1.6rem, transparent 1.65rem) 0 0 / 3rem
+			3rem repeat-x;
+	}
+
+	/* The washing line: butter fading to blossom by day, lavender to blossom at night,
+	   with the sun (the moon at night) peeking in from the top corner.
+	   Muted is at least 5.02:1 by day and 6.42:1 at night */
+	.sunny {
+		--sunny: var(--color-butter);
+		--sun-glow: var(--color-butter);
+
+		background: linear-gradient(160deg, var(--sunny), var(--color-blossom));
+	}
+
+	.sunny::after {
+		content: '';
+		position: absolute;
+		inset-block-start: -3rem;
+		inset-inline-end: -3rem;
+		inline-size: 14rem;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background-color: var(--color-butter);
+		box-shadow: 0 0 3rem 1rem var(--sun-glow);
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .sunny {
+			--sunny: var(--color-lavender);
+			--sun-glow: var(--color-sky);
+			--halo: 0 0 0.1em var(--color-bg), 0 0 0.2em var(--color-bg), 0 0 0.3em var(--color-bg);
+		}
+	}
+
+	:global(:root[data-theme='dark']) .sunny {
+		--sunny: var(--color-lavender);
+		--sun-glow: var(--color-sky);
+		--halo: 0 0 0.1em var(--color-bg), 0 0 0.2em var(--color-bg), 0 0 0.3em var(--color-bg);
+	}
+
+	/* The greenhouse: panes 6rem wide and 5rem high, framed by 0.125rem lines in 70% surface,
+	   over sky fading to lavender. Muted is at least 5.0:1 by day and 6.89:1 at night */
+	.glass {
+		background:
+			linear-gradient(
+					90deg,
+					transparent calc(100% - 0.125rem),
+					color-mix(in srgb, var(--color-surface) 70%, transparent) 0
+				)
+				0 0 / 6rem 100%,
+			linear-gradient(
+					180deg,
+					transparent calc(100% - 0.125rem),
+					color-mix(in srgb, var(--color-surface) 70%, transparent) 0
+				)
+				0 0 / 100% 5rem,
+			linear-gradient(160deg, var(--color-sky), var(--color-lavender));
 	}
 </style>
