@@ -13,11 +13,14 @@ interface Props {
 
 const { title, summary, href, cover, coverAlt, headingLevel = 2 } = Astro.props;
 const Heading = `h${headingLevel}`;
+// The passion's id is the last part of its link, e.g. /passions/cooking/ -> cooking; it names the back
+const backId = `back-${href.split('/').filter(Boolean).at(-1)}`;
 ---
 
 <!-- A pegged polaroid from the garden design: a wooden peg and two faces. The front has the photo and
      the title, the back (blossom) the title, the summary and a Read more link to the passion page.
-     Without JavaScript nothing is hidden: the back simply shows under the front -->
+     Without JavaScript nothing is hidden: the back simply shows under the front. Once the script runs,
+     the faces lie back to back and the Flip buttons (hidden until then) turn the card over -->
 <article class="polaroid">
 	<span class="peg" aria-hidden="true"></span>
 	<div class="flipper">
@@ -29,15 +32,53 @@ const Heading = `h${headingLevel}`;
 				widths={[320, 640, 960]}
 				sizes="(min-width: 72rem) 14.25rem, (min-width: 64em) calc(25vw - 3.75rem), (min-width: 36em) calc(50vw - 3.5rem), calc(100vw - 3.5rem)"
 			/>
-			<Heading class="title">{title}</Heading>
+			<div class="row">
+				<Heading class="title">{title}</Heading>
+				<button type="button" class="flip" aria-expanded="false" aria-controls={backId} hidden>
+					Flip<span class="visually-hidden"> {title}</span>
+				</button>
+			</div>
 		</div>
-		<div class="face back">
+		<div class="face back" id={backId}>
 			<Heading class="title">{title}</Heading>
 			<p>{summary}</p>
-			<a class="more" href={href}>Read more<span class="visually-hidden"> about {title}</span></a>
+			<div class="row">
+				<a class="more" href={href}>Read more<span class="visually-hidden"> about {title}</span></a>
+				<button type="button" class="flip" hidden>
+					Flip back<span class="visually-hidden"> {title}</span>
+				</button>
+			</div>
 		</div>
 	</div>
 </article>
+
+<script>
+	// Turn the polaroids over. Only once this runs do the Flip buttons appear and the faces lie
+	// back to back; the side facing away is inert, so keyboard and screen readers skip it
+	document.querySelectorAll<HTMLElement>('.polaroid').forEach((card) => {
+		const front = card.querySelector<HTMLElement>('.front')!;
+		const back = card.querySelector<HTMLElement>('.back')!;
+		const [toBack, toFront] = card.querySelectorAll<HTMLButtonElement>('.flip');
+
+		card.dataset.flippable = '';
+		back.inert = true;
+		toBack.hidden = false;
+		toFront.hidden = false;
+
+		const flip = () => {
+			const showBack = !card.hasAttribute('data-flipped');
+			card.toggleAttribute('data-flipped', showBack);
+			front.inert = showBack;
+			back.inert = !showBack;
+			toBack.setAttribute('aria-expanded', String(showBack));
+			// Focus follows to the button on the side that is now showing
+			(showBack ? toFront : toBack).focus();
+		};
+
+		toBack.addEventListener('click', flip);
+		toFront.addEventListener('click', flip);
+	});
+</script>
 
 <style>
 	/* Each polaroid turns around its peg, tilting a different way in a repeating set of four */
@@ -114,8 +155,51 @@ const Heading = `h${headingLevel}`;
 		margin-block-start: 0.5rem;
 	}
 
-	.more {
-		justify-self: start;
+	/* Title and Flip on the front, Read more and Flip back on the back */
+	.row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1rem;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	/* The design's dark pill. Padding makes it 2.75rem high (1lh is its own line height).
+	   No display here, so the hidden attribute keeps it out until the script runs.
+	   Background on ink is 12.84:1 by day and 15.12:1 at night */
+	.flip {
+		padding-block: calc((2.75rem - 1lh) / 2);
+		padding-inline: 0.9rem;
+		border: 0;
+		border-radius: var(--radius-pill);
+		background-color: var(--color-ink);
+		color: var(--color-bg);
+		font: inherit;
+		font-size: var(--step--1);
+		cursor: pointer;
+	}
+
+	/* Once the script runs: the faces share one grid cell, back to back, in 3D like the design.
+	   Each face hides its back side, and the back starts turned away */
+	.polaroid[data-flippable] {
+		perspective: 60rem;
+	}
+
+	.polaroid[data-flippable] .flipper {
+		transform-style: preserve-3d;
+	}
+
+	.polaroid[data-flippable] .face {
+		grid-area: 1 / 1;
+		backface-visibility: hidden;
+	}
+
+	.polaroid[data-flippable] .back {
+		transform: rotateY(180deg);
+	}
+
+	.polaroid[data-flipped] .flipper {
+		transform: rotateY(180deg);
 	}
 
 	/* Draw the focus ring of the Read more link around the whole polaroid instead */
