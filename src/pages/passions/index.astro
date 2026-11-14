@@ -44,10 +44,17 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 </BaseLayout>
 
 <style>
-	/* The washing line: blossom fading into the page under the sunny head */
+	/* The washing line: blossom fading into the page under the sunny head.
+	   In one column the polaroids are tall, so their tilt swings the lowest corner out further.
+	   The inline padding keeps every focus ring on screen down to 320px: 0.75rem growing to
+	   about 1.6rem; from 36em the cards are half as wide and need no extra room.
+	   overflow-x: clip is the safety net: anything still past the screen edge is cut off,
+	   without making a scroll box */
 	.line-room {
 		position: relative;
+		overflow-x: clip;
 		padding-block: var(--space-xl) var(--space-2xl);
+		padding-inline: clamp(0.75rem, 6.5vw - 0.75rem, 2rem);
 		background: linear-gradient(180deg, var(--color-blossom), var(--color-bg) 40%);
 	}
 
@@ -66,6 +73,10 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 
 	/* Two side by side from 36em: one card across the full width is too wide */
 	@media (min-width: 36em) {
+		.line-room {
+			padding-inline: 0;
+		}
+
 		ul {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}

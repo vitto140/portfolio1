@@ -1,6 +1,6 @@
 ---
 title: "Crocheting"
-summary: "Working with "
+summary: "Working with yarn and a hook, I turn simple stitches into things like this little monkey."
 cover: "./images/crocheting.jpeg"
 coverAlt: "a monkey made with yarn"
 ---

@@ -102,6 +102,16 @@ button:focus-visible {
   }
 }
 
+/* Text for screen readers only: hidden on screen, still read out */
+.visually-hidden {
+  position: absolute;
+  inline-size: 0.0625rem;
+  block-size: 0.0625rem;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* Layout */
 .wrapper {
   width: min(100% - 2rem, var(--container));
