@@ -10,16 +10,16 @@ interface Props {
 	stack: string[];
 	href: string;
 	cover: ImageMetadata;
-	coverAlt: string;
 	headingLevel?: 2 | 3 | 4 | 5 | 6;
 }
 
-const { title, summary, year, role, stack, href, cover, coverAlt, headingLevel = 2 } = Astro.props;
+const { title, summary, year, role, stack, href, cover, headingLevel = 2 } = Astro.props;
 const Heading = `h${headingLevel}`;
 // The work's id is the last part of its link, e.g. /works/exit-your-matrix/ -> exit-your-matrix
 const workId = href.split('/').filter(Boolean).at(-1);
 
-// The visible cover and the blurred one in the doorway use the same file, so it loads once
+// The cover only shows inside the doorway, blurred, when the door opens: decoration, so alt="".
+// The work page itself shows it in full, with its description
 const coverWidths = [320, 640, 960];
 const coverSizes =
 	'(min-width: 72rem) 15.75rem, (min-width: 64em) calc(25vw - 2.25rem), (min-width: 36em) min(calc(50vw - 2rem), 20rem), min(calc(100vw - 2rem), 20rem)';
@@ -43,7 +43,6 @@ const coverSizes =
 			</div>
 		</div>
 	</div>
-	<Image class="cover" src={cover} alt={coverAlt} widths={coverWidths} sizes={coverSizes} />
 	<Heading class="title"><a href={href}>{title}</a></Heading>
 	<p>{summary}</p>
 	<p class="year">{year} · {role}</p>
@@ -356,15 +355,6 @@ const coverSizes =
 		border-radius: inherit;
 		background: linear-gradient(90deg, transparent, var(--color-shade));
 		opacity: 0;
-	}
-
-	.cover {
-		inline-size: 100%;
-		max-inline-size: 20rem;
-		block-size: auto;
-		aspect-ratio: 16 / 10;
-		object-fit: cover;
-		border-radius: var(--radius-m);
 	}
 
 	.title {
