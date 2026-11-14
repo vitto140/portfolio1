@@ -16,6 +16,8 @@ interface Props {
 
 const { title, summary, year, role, stack, href, cover, coverAlt, headingLevel = 2 } = Astro.props;
 const Heading = `h${headingLevel}`;
+// The work's id is the last part of its link, e.g. /works/exit-your-matrix/ -> exit-your-matrix
+const workId = href.split('/').filter(Boolean).at(-1);
 
 // The visible cover and the blurred one in the doorway use the same file, so it loads once
 const coverWidths = [320, 640, 960];
@@ -26,7 +28,7 @@ const coverSizes =
 <!-- A wooden door in a hedge arch, from the garden design. The arch is decoration only.
      Behind the door is the doorway: the cover, blurred, in a warm glow. The door hinges on its left
      and has a shade that can darken it as it swings. The title link stretches over the whole card -->
-<article class="work">
+<article class="work" data-work={workId}>
 	<div class="arch" aria-hidden="true">
 		<span class="leaf leaf-left"></span>
 		<span class="leaf leaf-right"></span>
@@ -49,6 +51,90 @@ const coverSizes =
 		{stack.map((item) => <li>{item}</li>)}
 	</ul>
 </article>
+
+<script>
+	import { gsap } from 'gsap';
+
+	// Walk through a door, like the design's enter(): the latch gives, the door swings open
+	// on its hinge, the shade deepens and the warm light spills out, then the work page opens.
+	// Only with no-preference: with reduced motion there is no handler and the link just opens.
+	const mm = gsap.matchMedia();
+
+	mm.add('(prefers-reduced-motion: no-preference)', () => {
+		let busy = false;
+
+		const onClick = (event: MouseEvent) => {
+			const link = (event.target as Element).closest<HTMLAnchorElement>('.work .title a');
+			if (!link) return;
+			// Cmd, Ctrl, Shift or Alt-click, or any button but the main one: let the browser do its thing
+			if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+			event.preventDefault();
+			// One door at a time: ignore clicks while a door is already opening
+			if (busy) return;
+			busy = true;
+
+			const card = link.closest<HTMLElement>('.work')!;
+			const door = card.querySelector<HTMLElement>('.door')!;
+			const shade = card.querySelector('.shade');
+			const opening = card.querySelector<HTMLElement>('.opening')!;
+			const glow = card.querySelector('.glow');
+
+			// Where the doorway is, so the work page can grow out of it (step 5)
+			const rect = opening.getBoundingClientRect();
+			try {
+				sessionStorage.setItem(
+					'door',
+					JSON.stringify({
+						work: card.dataset.work,
+						top: rect.top,
+						left: rect.left,
+						width: rect.width,
+						height: rect.height,
+					}),
+				);
+			} catch {
+				// Storage blocked: the page still opens, just without growing out of the door
+			}
+
+			// Take over from the CSS hover nudge where it is right now (also halfway through its
+			// transition), so the door never snaps back: CSS rotate becomes GSAP's rotateY in one frame
+			const nudge = parseFloat(getComputedStyle(door).rotate.match(/-?[\d.]+(?=deg)/)?.[0] ?? '0');
+			door.style.transition = 'none';
+			door.style.rotate = 'none';
+			gsap.set(door, { rotateY: nudge });
+
+			// The latch gives 6deg more from there, then the door swings open
+			gsap
+				.timeline()
+				.to(door, { rotateY: nudge - 6, duration: 0.12, ease: 'power1.out' })
+				.to(door, { rotateY: -118, duration: 0.85, ease: 'power3.inOut' })
+				.to(shade, { opacity: 1, duration: 0.6, ease: 'power1.in' }, '<')
+				.fromTo(glow, { opacity: 0.9 }, { opacity: 1, scale: 1.25, duration: 0.6 }, '<0.2')
+				.add(() => {
+					location.href = link.href;
+				}, '-=0.35');
+		};
+
+		// Coming back through the back-forward cache: the page is restored as it was left,
+		// so close the door again and accept clicks (step 6 replaces this with a swing shut)
+		const onPageShow = (event: PageTransitionEvent) => {
+			if (!event.persisted) return;
+			busy = false;
+			document.querySelectorAll<HTMLElement>('.work .door').forEach((door) => {
+				gsap.set(door, { clearProps: 'transform,rotate,transition' });
+			});
+			gsap.set('.work .shade, .work .glow', { clearProps: 'opacity,transform' });
+		};
+
+		document.addEventListener('click', onClick);
+		window.addEventListener('pageshow', onPageShow);
+
+		return () => {
+			document.removeEventListener('click', onClick);
+			window.removeEventListener('pageshow', onPageShow);
+		};
+	});
+</script>
 
 <style>
 	.work {
