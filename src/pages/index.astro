@@ -69,7 +69,7 @@ const stars = Array.from({ length: 36 }, () => ({
 	<section class="room">
 		<div class="wrapper">
 			<h2>Off the screen</h2>
-			<ul>
+			<ul class="polaroids">
 				{
 					passions.map((passion) => (
 						<li>
@@ -227,6 +227,11 @@ const stars = Array.from({ length: 36 }, () => ({
 		gap: var(--space-xl) var(--space-l);
 		padding: 0;
 		list-style: none;
+	}
+
+	/* The pegs reach 1.1rem above each polaroid */
+	.polaroids {
+		padding-block-start: var(--space-m);
 	}
 
 	/* Two side by side from 36em: one card across the full width is too wide */

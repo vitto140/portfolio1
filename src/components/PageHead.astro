@@ -3,15 +3,16 @@ interface Props {
 	eyebrow: string;
 	title: string;
 	lede: string;
-	/** The garden design's full-width head with a hedge rising from the bottom.
-	    Needs a page with BaseLayout's bleed, since it brings its own .wrapper */
+	/** The hedge wall: a hedge rising from the bottom of the head */
 	edge?: 'hedge';
-	/** A coloured sky behind the head: sunny by day, dusk at night */
+	/** The washing line: a sunny head with the sun in the corner */
 	sky?: 'sunny';
 }
 
+// Both are the garden design's full-width head. They need a page with BaseLayout's bleed,
+// since the head brings its own .wrapper
 const { eyebrow, title, lede, edge, sky } = Astro.props;
-const garden = edge === 'hedge';
+const garden = edge === 'hedge' || sky === 'sunny';
 ---
 
 <header class:list={[edge, sky, { garden }]}>
@@ -49,14 +50,17 @@ const garden = edge === 'hedge';
 	.garden {
 		position: relative;
 		overflow: hidden;
-		padding-block: var(--space-2xl);
+		padding-block: var(--space-2xl) var(--space-xl);
 	}
 
+	/* --halo is only set at night on the sunny head: a soft edge in the night background
+	   around every letter, so the title keeps 4.5:1 where it crosses the moon */
 	.garden .inner {
 		position: relative;
 		z-index: 1;
 		display: grid;
 		gap: var(--space-s);
+		text-shadow: var(--halo, none);
 	}
 
 	.garden hgroup {
@@ -83,6 +87,7 @@ const garden = edge === 'hedge';
 	/* The hedge wall: sky fading to sage, with the round top of the hedge rising from the bottom.
 	   The section under the head is hedge, so the bumps join it */
 	.hedge {
+		padding-block-end: var(--space-2xl);
 		background: linear-gradient(180deg, var(--color-sky), var(--color-sage));
 	}
 
@@ -94,22 +99,39 @@ const garden = edge === 'hedge';
 			3rem repeat-x;
 	}
 
-	/* Sunny by day. Muted on butter is 5.51:1 */
+	/* The washing line: butter fading to blossom by day, lavender to blossom at night,
+	   with the sun (the moon at night) peeking in from the top corner.
+	   Muted is at least 5.02:1 by day and 6.42:1 at night */
 	.sunny {
-		padding: var(--space-m);
-		background: var(--color-butter);
-		border-radius: var(--radius-l);
+		--sunny: var(--color-butter);
+		--sun-glow: var(--color-butter);
+
+		background: linear-gradient(160deg, var(--sunny), var(--color-blossom));
 	}
 
-	/* Dusk at night: night butter is too light for text, so lavender fading to blossom.
-	   Muted is 6.89:1 on lavender and 6.42:1 on blossom */
+	.sunny::after {
+		content: '';
+		position: absolute;
+		inset-block-start: -3rem;
+		inset-inline-end: -3rem;
+		inline-size: 14rem;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background-color: var(--color-butter);
+		box-shadow: 0 0 3rem 1rem var(--sun-glow);
+	}
+
 	@media (prefers-color-scheme: dark) {
 		:global(:root:not([data-theme='light'])) .sunny {
-			background: linear-gradient(var(--color-lavender), var(--color-blossom));
+			--sunny: var(--color-lavender);
+			--sun-glow: var(--color-sky);
+			--halo: 0 0 0.1em var(--color-bg), 0 0 0.2em var(--color-bg), 0 0 0.3em var(--color-bg);
 		}
 	}
 
 	:global(:root[data-theme='dark']) .sunny {
-		background: linear-gradient(var(--color-lavender), var(--color-blossom));
+		--sunny: var(--color-lavender);
+		--sun-glow: var(--color-sky);
+		--halo: 0 0 0.1em var(--color-bg), 0 0 0.2em var(--color-bg), 0 0 0.3em var(--color-bg);
 	}
 </style>
