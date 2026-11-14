@@ -26,6 +26,27 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 				if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
 			} catch {}
 		</script>
+		<script is:inline>
+			// Note the page we leave, so the next page knows where we came from (the work doors use it)
+			addEventListener('pagehide', () => {
+				try {
+					sessionStorage.setItem('from', location.pathname);
+				} catch {}
+			});
+
+			// Coming back from a work page: show its door wide open from the very first frame,
+			// so it can swing shut (WorkCard takes over and removes this). Only with no-preference
+			try {
+				const id = sessionStorage.getItem('from')?.match(/\/works\/([a-z0-9-]+)\/$/)?.[1];
+				if (id && matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+					const door = `.work[data-work="${id}"]`;
+					const style = document.createElement('style');
+					style.id = 'door-back';
+					style.textContent = `${door} .door { transform: rotateY(-118deg); } ${door} .shade { opacity: 1; } ${door} .glow { opacity: 1; transform: scale(1.25); }`;
+					document.head.append(style);
+				}
+			} catch {}
+		</script>
 		<meta name="description" content={description} />
 		<link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`} />
 		<link rel="icon" href={`${base}favicon.ico`} />
@@ -37,6 +58,8 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 		/>
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<!-- For scripts that must run before the first frame, like a page's view transition -->
+		<slot name="head" />
 	</head>
 	<body>
 		<Header />

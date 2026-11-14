@@ -86,6 +86,22 @@ button:focus-visible {
   border-radius: var(--radius-s);
 }
 
+/* Page changes as cross-document view transitions, only with no-preference.
+   The default cross-fade is switched off: the old page stays as it is underneath, and a work page
+   grows over it out of the door it was opened from (works/[id].astro). Other page changes are instant */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+}
+
 /* Layout */
 .wrapper {
   width: min(100% - 2rem, var(--container));

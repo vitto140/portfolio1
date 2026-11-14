@@ -20,6 +20,9 @@
   --color-on-pop: #23302A;
   --color-focus: var(--color-accent-strong);
   --color-shadow: rgb(35 48 42 / 18%);
+  /* The doorway behind each work door: warm light, and the shade on the door as it swings */
+  --color-doorway: #FFF6D8;
+  --color-shade: rgb(35 48 42 / 35%);
 
   /* Font families (loaded in BaseLayout) */
   --font-sans: 'Bricolage Grotesque', system-ui, sans-serif;
@@ -73,6 +76,8 @@
     --color-wood-deep: #3E3026;
     --color-focus: var(--color-accent);
     --color-shadow: rgb(0 0 0 / 50%);
+    --color-doorway: #FFE9A3;
+    --color-shade: rgb(0 0 0 / 55%);
   }
 }
 
@@ -96,4 +101,6 @@
   --color-wood-deep: #3E3026;
   --color-focus: var(--color-accent);
   --color-shadow: rgb(0 0 0 / 50%);
+  --color-doorway: #FFE9A3;
+  --color-shade: rgb(0 0 0 / 55%);
 }

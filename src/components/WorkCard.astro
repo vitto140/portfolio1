@@ -10,31 +10,39 @@ interface Props {
 	stack: string[];
 	href: string;
 	cover: ImageMetadata;
-	coverAlt: string;
 	headingLevel?: 2 | 3 | 4 | 5 | 6;
 }
 
-const { title, summary, year, role, stack, href, cover, coverAlt, headingLevel = 2 } = Astro.props;
+const { title, summary, year, role, stack, href, cover, headingLevel = 2 } = Astro.props;
 const Heading = `h${headingLevel}`;
+// The work's id is the last part of its link, e.g. /works/exit-your-matrix/ -> exit-your-matrix
+const workId = href.split('/').filter(Boolean).at(-1);
+
+// The cover only shows inside the doorway, blurred, when the door opens: decoration, so alt="".
+// The work page itself shows it in full, with its description
+const coverWidths = [320, 640, 960];
+const coverSizes =
+	'(min-width: 72rem) 15.75rem, (min-width: 64em) calc(25vw - 2.25rem), (min-width: 36em) min(calc(50vw - 2rem), 20rem), min(calc(100vw - 2rem), 20rem)';
 ---
 
 <!-- A wooden door in a hedge arch, from the garden design. The arch is decoration only.
-     The title link stretches over the whole card, so the card is one link -->
-<article class="work">
+     Behind the door is the doorway: the cover, blurred, in a warm glow. The door hinges on its left
+     and has a shade that can darken it as it swings. The title link stretches over the whole card -->
+<article class="work" data-work={workId}>
 	<div class="arch" aria-hidden="true">
 		<span class="leaf leaf-left"></span>
 		<span class="leaf leaf-right"></span>
-		<div class="door">
-			<span class="knob"></span>
+		<div class="frame">
+			<div class="opening">
+				<Image class="opening-cover" src={cover} alt="" widths={coverWidths} sizes={coverSizes} />
+				<span class="glow"></span>
+			</div>
+			<div class="door">
+				<span class="knob"></span>
+				<span class="shade"></span>
+			</div>
 		</div>
 	</div>
-	<Image
-		class="cover"
-		src={cover}
-		alt={coverAlt}
-		widths={[320, 640, 960]}
-		sizes="(min-width: 72rem) 15.75rem, (min-width: 64em) calc(25vw - 2.25rem), (min-width: 36em) min(calc(50vw - 2rem), 20rem), min(calc(100vw - 2rem), 20rem)"
-	/>
 	<Heading class="title"><a href={href}>{title}</a></Heading>
 	<p>{summary}</p>
 	<p class="year">{year} · {role}</p>
@@ -42,6 +50,184 @@ const Heading = `h${headingLevel}`;
 		{stack.map((item) => <li>{item}</li>)}
 	</ul>
 </article>
+
+<script>
+	import { gsap } from 'gsap';
+
+	// The card of the work page we just came back from, if any. BaseLayout notes the path of
+	// every page we leave, so this is only set when the previous page was that work page
+	const cameFrom = () => {
+		let from = null;
+		try {
+			from = sessionStorage.getItem('from');
+		} catch {
+			return null;
+		}
+		const id = from?.match(/\/works\/([^/]+)\/$/)?.[1];
+		return id ? document.querySelector<HTMLElement>(`.work[data-work="${CSS.escape(id)}"]`) : null;
+	};
+
+	const linkOf = (card: HTMLElement) => card.querySelector<HTMLAnchorElement>('.title a');
+
+	// Tabbing to a door: the browser only scrolls the focused link (the title) into view, which can
+	// leave the door and its focus ring above the screen. Bring the door into view with it, at once.
+	// If door and title don't fit on the screen together, keep the title in view with as much door as fits
+	document.addEventListener('focusin', (event) => {
+		const link = (event.target as Element).closest?.<HTMLAnchorElement>('.work .title a');
+		if (!link?.matches(':focus-visible')) return;
+		const arch = link.closest('.work')!.querySelector('.arch')!.getBoundingClientRect();
+		const title = link.closest('.title')!.getBoundingClientRect();
+		const space = parseFloat(getComputedStyle(document.documentElement).fontSize); // 1rem of air
+		const top = arch.top - space;
+		const bottom = title.bottom + space;
+		if (top >= 0 && bottom <= innerHeight) return;
+		const fits = bottom - top <= innerHeight;
+		scrollBy({ top: fits && top < 0 ? top : bottom - innerHeight, behavior: 'instant' });
+	});
+
+	const mm = gsap.matchMedia();
+
+	mm.add(
+		{ motion: '(prefers-reduced-motion: no-preference)', still: '(prefers-reduced-motion: reduce)' },
+		(context) => {
+			// Reduced motion: no handlers, links just open. Coming back, focus returns to the door
+			// that was opened, without any movement
+			if (!context.conditions?.motion) {
+				const card = cameFrom();
+				if (card) linkOf(card)?.focus();
+				const onPageShow = (event: PageTransitionEvent) => {
+					const back = event.persisted && cameFrom();
+					if (back) linkOf(back)?.focus();
+				};
+				window.addEventListener('pageshow', onPageShow);
+				return () => window.removeEventListener('pageshow', onPageShow);
+			}
+
+			let busy = false;
+			let opening: gsap.core.Timeline | null = null;
+			let openCard: HTMLElement | null = null;
+
+			// Walk through a door, like the design's enter(): the latch gives, the door swings open
+			// on its hinge, the shade deepens and the warm light spills out, then the work page opens
+			const onClick = (event: MouseEvent) => {
+				const link = (event.target as Element).closest<HTMLAnchorElement>('.work .title a');
+				if (!link) return;
+				// Cmd, Ctrl, Shift or Alt-click, or any button but the main one: let the browser do its thing
+				if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+				event.preventDefault();
+				// One door at a time: ignore clicks while a door is opening or closing
+				if (busy) return;
+				busy = true;
+
+				const card = link.closest<HTMLElement>('.work')!;
+				const door = card.querySelector<HTMLElement>('.door')!;
+				const shade = card.querySelector('.shade');
+				const doorway = card.querySelector<HTMLElement>('.opening')!;
+				const glow = card.querySelector('.glow');
+
+				// Bring the whole door into view first (with Enter the browser may have scrolled it away),
+				// centred and at once, so you see it swing and the work page grows out of it on screen
+				card.querySelector('.arch')!.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
+
+				// Where the doorway is, so the work page can grow out of it
+				const rect = doorway.getBoundingClientRect();
+				try {
+					sessionStorage.setItem(
+						'door',
+						JSON.stringify({
+							work: card.dataset.work,
+							top: rect.top,
+							left: rect.left,
+							width: rect.width,
+							height: rect.height,
+						}),
+					);
+				} catch {
+					// Storage blocked: the page still opens, just without growing out of the door
+				}
+
+				// Take over from the CSS hover nudge where it is right now (also halfway through its
+				// transition), so the door never snaps back: CSS rotate becomes GSAP's rotateY in one frame
+				const nudge = parseFloat(getComputedStyle(door).rotate.match(/-?[\d.]+(?=deg)/)?.[0] ?? '0');
+				door.style.transition = 'none';
+				door.style.rotate = 'none';
+				gsap.set(door, { rotateY: nudge });
+
+				// The latch gives 6deg more from there, then the door swings open
+				openCard = card;
+				opening = gsap
+					.timeline()
+					.to(door, { rotateY: nudge - 6, duration: 0.12, ease: 'power1.out' })
+					.to(door, { rotateY: -118, duration: 0.85, ease: 'power3.inOut' })
+					.to(shade, { opacity: 1, duration: 0.6, ease: 'power1.in' }, '<')
+					.fromTo(glow, { opacity: 0.9 }, { opacity: 1, scale: 1.25, duration: 0.6 }, '<0.2')
+					.add(() => {
+						location.href = link.href;
+					}, '-=0.35');
+			};
+
+			// Close a door, like the design's leave(): the light pulls back, the door swings shut,
+			// taps the frame and settles with a small bounce. Then focus returns to its link.
+			// wideOpen: start from fully open (a fresh page); otherwise from where the door is now
+			const close = (card: HTMLElement, wideOpen: boolean) => {
+				busy = true;
+				const door = card.querySelector<HTMLElement>('.door')!;
+				const shade = card.querySelector('.shade');
+				const glow = card.querySelector('.glow');
+
+				card.querySelector('.arch')!.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
+				door.style.transition = 'none';
+				door.style.rotate = 'none';
+				if (wideOpen) {
+					gsap.set(door, { rotateY: -118 });
+					gsap.set(shade, { opacity: 1 });
+					gsap.set(glow, { opacity: 1, scale: 1.25 });
+				}
+				// The head script showed this door open before the first frame; GSAP holds it now
+				document.getElementById('door-back')?.remove();
+
+				gsap
+					.timeline({
+						onComplete: () => {
+							// Hand the door back to CSS, so the hover nudge works again
+							gsap.set([door, shade, glow], { clearProps: 'all' });
+							busy = false;
+							linkOf(card)?.focus({ preventScroll: true });
+						},
+					})
+					.to(glow, { scale: 1, duration: 0.4 })
+					.to(door, { rotateY: 0, duration: 0.5, ease: 'power3.in' }, '<')
+					.to(shade, { opacity: 0, duration: 0.5 }, '<')
+					.to(door, { rotateY: -3, duration: 0.08, ease: 'power1.out' })
+					.to(door, { rotateY: 0, duration: 0.25, ease: 'bounce.out' });
+			};
+
+			// Coming back with the back link or a fresh Back: the door starts open and swings shut
+			const back = cameFrom();
+			if (back) close(back, true);
+
+			// Coming back through the back-forward cache: the page is restored as it was left, with
+			// the door still opening. Stop that and swing the same door shut from where it is
+			const onPageShow = (event: PageTransitionEvent) => {
+				if (!event.persisted) return;
+				opening?.kill();
+				opening = null;
+				const card = openCard ?? cameFrom();
+				openCard = null;
+				if (card) close(card, false);
+				else busy = false;
+			};
+
+			document.addEventListener('click', onClick);
+			window.addEventListener('pageshow', onPageShow);
+
+			return () => {
+				document.removeEventListener('click', onClick);
+				window.removeEventListener('pageshow', onPageShow);
+			};
+		},
+	);
+</script>
 
 <style>
 	.work {
@@ -89,12 +275,48 @@ const Heading = `h${headingLevel}`;
 		rotate: -25deg;
 	}
 
-	/* Wooden door: planks with wood-deep seams, a wood-deep frame and a shadow on the hinge side */
-	.door {
+	/* The doorframe: the 3D space the door swings in */
+	.frame {
 		position: relative;
 		block-size: 100%;
-		border: 0.25rem solid var(--color-wood-deep);
+		perspective: 45rem;
+	}
+
+	/* The doorway and the door share the arch shape and lie on top of each other */
+	.opening,
+	.door {
+		position: absolute;
+		inset: 0;
 		border-radius: 50% 50% 0.25rem 0.25rem / 30% 30% 0.25rem 0.25rem;
+	}
+
+	/* The doorway: warm light, the cover softly blurred, and a glow from below */
+	.opening {
+		overflow: hidden;
+		background-color: var(--color-doorway);
+	}
+
+	.opening-cover {
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		opacity: 0.55;
+		filter: blur(0.15rem) saturate(0.8);
+	}
+
+	.glow {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(ellipse at 50% 75%, var(--color-doorway) 10%, transparent 75%);
+		opacity: 0.9;
+	}
+
+	/* Wooden door: planks with wood-deep seams, a wood-deep frame and a shadow on the hinge side.
+	   It turns on its hinge (the left edge) in 3D */
+	.door {
+		transform-origin: left center;
+		transform-style: preserve-3d;
+		border: 0.25rem solid var(--color-wood-deep);
 		background:
 			repeating-linear-gradient(90deg, transparent 0 22%, var(--color-wood-deep) 22% calc(22% + 0.125rem)),
 			var(--color-wood);
@@ -112,13 +334,27 @@ const Heading = `h${headingLevel}`;
 		box-shadow: 0 0.12rem 0 var(--color-accent-strong);
 	}
 
-	.cover {
-		inline-size: 100%;
-		max-inline-size: 20rem;
-		block-size: auto;
-		aspect-ratio: 16 / 10;
-		object-fit: cover;
-		border-radius: var(--radius-m);
+	/* The door nudges open a little on its hinge when you hover the card or tab to it.
+	   It springs open with a small overshoot and eases shut again, as in the design */
+	@media (prefers-reduced-motion: no-preference) {
+		.door {
+			transition: rotate 0.35s ease;
+		}
+
+		.work:hover .door,
+		.work:has(.title a:focus-visible) .door {
+			rotate: y -8deg;
+			transition: rotate 0.4s cubic-bezier(0.3, 1.4, 0.5, 1);
+		}
+	}
+
+	/* The shade darkens the door towards its free edge as it swings. Hidden while closed */
+	.shade {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background: linear-gradient(90deg, transparent, var(--color-shade));
+		opacity: 0;
 	}
 
 	.title {
