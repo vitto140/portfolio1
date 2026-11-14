@@ -226,6 +226,12 @@ const stars = Array.from({ length: 36 }, () => ({
 		gap: var(--space-l);
 	}
 
+	/* Touch targets: padding grows "All works" and "All passions" to 2.75rem high */
+	.room p a {
+		display: inline-block;
+		padding-block: calc((2.75rem - 1lh) / 2);
+	}
+
 	.room-works {
 		background-color: var(--color-sage);
 	}

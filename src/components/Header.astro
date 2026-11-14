@@ -145,7 +145,10 @@ const currentPath = normalize(Astro.url.pathname);
 		gap: var(--space-s) var(--space-m);
 	}
 
+	/* Touch targets: padding grows each link and button to 2.75rem high (1lh is its own line height) */
 	.name {
+		display: inline-block;
+		padding-block: calc((2.75rem - 1lh) / 2);
 		font-weight: 700;
 	}
 
@@ -205,6 +208,10 @@ const currentPath = normalize(Astro.url.pathname);
 		font: inherit;
 		font-size: var(--step--1);
 		cursor: pointer;
+	}
+
+	.mode button {
+		padding-block: calc((2.75rem - 1lh) / 2);
 	}
 
 	button[aria-pressed='true'] {
