@@ -54,4 +54,11 @@ const works = (await getCollection('works')).sort(
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 	}
+
+	/* Four in a row from 64em: two cards leave too much empty space */
+	@media (min-width: 64em) {
+		ul {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
+	}
 </style>
