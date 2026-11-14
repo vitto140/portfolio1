@@ -16,25 +16,32 @@ interface Props {
 
 const { title, summary, year, role, stack, href, cover, coverAlt, headingLevel = 2 } = Astro.props;
 const Heading = `h${headingLevel}`;
+
+// The visible cover and the blurred one in the doorway use the same file, so it loads once
+const coverWidths = [320, 640, 960];
+const coverSizes =
+	'(min-width: 72rem) 15.75rem, (min-width: 64em) calc(25vw - 2.25rem), (min-width: 36em) min(calc(50vw - 2rem), 20rem), min(calc(100vw - 2rem), 20rem)';
 ---
 
 <!-- A wooden door in a hedge arch, from the garden design. The arch is decoration only.
-     The title link stretches over the whole card, so the card is one link -->
+     Behind the door is the doorway: the cover, blurred, in a warm glow. The door hinges on its left
+     and has a shade that can darken it as it swings. The title link stretches over the whole card -->
 <article class="work">
 	<div class="arch" aria-hidden="true">
 		<span class="leaf leaf-left"></span>
 		<span class="leaf leaf-right"></span>
-		<div class="door">
-			<span class="knob"></span>
+		<div class="frame">
+			<div class="opening">
+				<Image class="opening-cover" src={cover} alt="" widths={coverWidths} sizes={coverSizes} />
+				<span class="glow"></span>
+			</div>
+			<div class="door">
+				<span class="knob"></span>
+				<span class="shade"></span>
+			</div>
 		</div>
 	</div>
-	<Image
-		class="cover"
-		src={cover}
-		alt={coverAlt}
-		widths={[320, 640, 960]}
-		sizes="(min-width: 72rem) 15.75rem, (min-width: 64em) calc(25vw - 2.25rem), (min-width: 36em) min(calc(50vw - 2rem), 20rem), min(calc(100vw - 2rem), 20rem)"
-	/>
+	<Image class="cover" src={cover} alt={coverAlt} widths={coverWidths} sizes={coverSizes} />
 	<Heading class="title"><a href={href}>{title}</a></Heading>
 	<p>{summary}</p>
 	<p class="year">{year} · {role}</p>
@@ -89,12 +96,48 @@ const Heading = `h${headingLevel}`;
 		rotate: -25deg;
 	}
 
-	/* Wooden door: planks with wood-deep seams, a wood-deep frame and a shadow on the hinge side */
-	.door {
+	/* The doorframe: the 3D space the door swings in */
+	.frame {
 		position: relative;
 		block-size: 100%;
-		border: 0.25rem solid var(--color-wood-deep);
+		perspective: 45rem;
+	}
+
+	/* The doorway and the door share the arch shape and lie on top of each other */
+	.opening,
+	.door {
+		position: absolute;
+		inset: 0;
 		border-radius: 50% 50% 0.25rem 0.25rem / 30% 30% 0.25rem 0.25rem;
+	}
+
+	/* The doorway: warm light, the cover softly blurred, and a glow from below */
+	.opening {
+		overflow: hidden;
+		background-color: var(--color-doorway);
+	}
+
+	.opening-cover {
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		opacity: 0.55;
+		filter: blur(0.15rem) saturate(0.8);
+	}
+
+	.glow {
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(ellipse at 50% 75%, var(--color-doorway) 10%, transparent 75%);
+		opacity: 0.9;
+	}
+
+	/* Wooden door: planks with wood-deep seams, a wood-deep frame and a shadow on the hinge side.
+	   It turns on its hinge (the left edge) in 3D */
+	.door {
+		transform-origin: left center;
+		transform-style: preserve-3d;
+		border: 0.25rem solid var(--color-wood-deep);
 		background:
 			repeating-linear-gradient(90deg, transparent 0 22%, var(--color-wood-deep) 22% calc(22% + 0.125rem)),
 			var(--color-wood);
@@ -110,6 +153,15 @@ const Heading = `h${headingLevel}`;
 		border-radius: 50%;
 		background-color: var(--color-accent);
 		box-shadow: 0 0.12rem 0 var(--color-accent-strong);
+	}
+
+	/* The shade darkens the door towards its free edge as it swings. Hidden while closed */
+	.shade {
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background: linear-gradient(90deg, transparent, var(--color-shade));
+		opacity: 0;
 	}
 
 	.cover {
