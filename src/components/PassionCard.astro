@@ -53,31 +53,87 @@ const backId = `back-${href.split('/').filter(Boolean).at(-1)}`;
 </article>
 
 <script>
+	import { gsap } from 'gsap';
+
 	// Turn the polaroids over. Only once this runs do the Flip buttons appear and the faces lie
 	// back to back; the side facing away is inert, so keyboard and screen readers skip it
-	document.querySelectorAll<HTMLElement>('.polaroid').forEach((card) => {
-		const front = card.querySelector<HTMLElement>('.front')!;
-		const back = card.querySelector<HTMLElement>('.back')!;
-		const [toBack, toFront] = card.querySelectorAll<HTMLButtonElement>('.flip');
+	const cards = [...document.querySelectorAll<HTMLElement>('.polaroid')];
 
+	cards.forEach((card) => {
 		card.dataset.flippable = '';
-		back.inert = true;
-		toBack.hidden = false;
-		toFront.hidden = false;
-
-		const flip = () => {
-			const showBack = !card.hasAttribute('data-flipped');
-			card.toggleAttribute('data-flipped', showBack);
-			front.inert = showBack;
-			back.inert = !showBack;
-			toBack.setAttribute('aria-expanded', String(showBack));
-			// Focus follows to the button on the side that is now showing
-			(showBack ? toFront : toBack).focus();
-		};
-
-		toBack.addEventListener('click', flip);
-		toFront.addEventListener('click', flip);
+		card.querySelector<HTMLElement>('.back')!.inert = true;
+		card.querySelectorAll<HTMLButtonElement>('.flip').forEach((button) => (button.hidden = false));
 	});
+
+	// Swap which side is showing: data-flipped (CSS turns the flipper), inert, aria-expanded,
+	// and focus moves to the button on the side that is now showing
+	const swapSides = (card: HTMLElement, showBack: boolean) => {
+		const [toBack, toFront] = card.querySelectorAll<HTMLButtonElement>('.flip');
+		card.toggleAttribute('data-flipped', showBack);
+		card.querySelector<HTMLElement>('.front')!.inert = showBack;
+		card.querySelector<HTMLElement>('.back')!.inert = !showBack;
+		toBack.setAttribute('aria-expanded', String(showBack));
+		(showBack ? toFront : toBack).focus();
+	};
+
+	const mm = gsap.matchMedia();
+
+	mm.add(
+		{ motion: '(prefers-reduced-motion: no-preference)', still: '(prefers-reduced-motion: reduce)' },
+		(context) => {
+			const motion = context.conditions?.motion;
+			// A card that is turning ignores more clicks, so a double click can't turn it straight back
+			const turning = new WeakSet<HTMLElement>();
+
+			// Like the design: the flipper turns over with a little overshoot while the card
+			// swings a few degrees on its peg and back. GSAP lets go at the end, so CSS holds the side.
+			// Added to the context by name, so it runs on each click (and is cleaned up with the media query)
+			const turn = context.add('turn', (card: HTMLElement, showBack: boolean) => {
+				const flipper = card.querySelector<HTMLElement>('.flipper')!;
+				turning.add(card);
+				gsap
+					.timeline({
+						onComplete: () => {
+							gsap.set([flipper, card], { clearProps: 'transform' });
+							turning.delete(card);
+						},
+					})
+					.fromTo(
+						flipper,
+						{ rotateY: showBack ? 0 : 180 },
+						{ rotateY: showBack ? 180 : 0, duration: 0.75, ease: 'back.out(1.4)' },
+						0,
+					)
+					.to(card, { rotation: showBack ? 4 : -3, duration: 0.25, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 0);
+			});
+
+			const onClick = (event: MouseEvent) => {
+				const button = (event.target as Element).closest<HTMLButtonElement>('.polaroid .flip');
+				// The second click of a double click (detail 2) doesn't count, also with reduced motion
+				if (!button || event.detail > 1) return;
+				const card = button.closest<HTMLElement>('.polaroid')!;
+				if (turning.has(card)) return;
+				const showBack = !card.hasAttribute('data-flipped');
+				swapSides(card, showBack);
+				// With reduced motion the card turns over at once: CSS does it, nothing moves
+				if (motion) turn(card, showBack);
+			};
+
+			// A press on a turning card would land on the side that just went inert and take focus
+			// away; keep focus on the button that is now showing
+			const onMouseDown = (event: MouseEvent) => {
+				const card = (event.target as Element).closest<HTMLElement>('.polaroid');
+				if (card && turning.has(card)) event.preventDefault();
+			};
+
+			document.addEventListener('click', onClick);
+			document.addEventListener('mousedown', onMouseDown);
+			return () => {
+				document.removeEventListener('click', onClick);
+				document.removeEventListener('mousedown', onMouseDown);
+			};
+		},
+	);
 </script>
 
 <style>
