@@ -186,8 +186,11 @@ const currentPath = normalize(Astro.url.pathname);
 		text-decoration-thickness: 0.25rem;
 	}
 
+	/* The gap keeps a focus ring off the pressed button next to it:
+	   0.375rem of ring (offset + width), plus a strip of pill between them */
 	.mode {
 		display: flex;
+		gap: 0.5rem;
 		justify-self: start;
 		padding: var(--space-2xs);
 		border: 0.0625rem solid var(--color-line);
