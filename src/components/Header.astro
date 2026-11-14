@@ -78,7 +78,7 @@ const currentPath = normalize(Astro.url.pathname);
 </header>
 
 <script>
-	import '../scripts/sound.js';
+	import { click } from '../scripts/sound.js';
 
 	const root = document.documentElement;
 	const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
@@ -130,7 +130,10 @@ const currentPath = normalize(Astro.url.pathname);
 	menuButton.hidden = false;
 	setOpen(false);
 
-	menuButton.addEventListener('click', () => setOpen(!isOpen()));
+	menuButton.addEventListener('click', () => {
+		setOpen(!isOpen());
+		click();
+	});
 
 	document.addEventListener('keydown', (event) => {
 		if (event.key === 'Escape' && isOpen()) {

@@ -11,7 +11,8 @@ const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
 const isDark = () => (root.dataset.theme ?? (systemDark.matches ? 'dark' : 'light')) === 'dark';
 
 let ctx;
-let master;
+let master; // the garden, faded in and out
+let effects; // doors and clicks, at the garden's full level
 let timer;
 let on = false; // the choice, as the button shows it
 let playing = false; // whether the garden plays on this page
@@ -65,8 +66,8 @@ function breeze() {
 	drift.start();
 }
 
-// One short gliding note
-function tone(type, from, to, start, duration, volume, pan) {
+// One short gliding note, into the garden unless told otherwise
+function tone(type, from, to, start, duration, volume, pan, bus = master) {
 	const oscillator = ctx.createOscillator();
 	const gain = ctx.createGain();
 	oscillator.type = type;
@@ -82,7 +83,7 @@ function tone(type, from, to, start, duration, volume, pan) {
 		panner.pan.value = pan;
 		out = out.connect(panner);
 	}
-	out.connect(master);
+	out.connect(bus);
 	oscillator.start(start);
 	oscillator.stop(start + duration + 0.02);
 }
@@ -130,10 +131,13 @@ function setup() {
 	master = ctx.createGain();
 	master.gain.value = 0;
 	master.connect(ctx.destination);
+	effects = ctx.createGain();
+	effects.gain.value = 0.6;
+	effects.connect(ctx.destination);
 	breeze();
-	// Once the browser lets the audio run, stop waiting for a press
+	// Once the garden runs, stop waiting for a press
 	ctx.addEventListener('statechange', () => {
-		if (ctx.state === 'running') stopWaiting();
+		if (ctx.state === 'running' && playing) stopWaiting();
 	});
 }
 
@@ -141,6 +145,7 @@ function fadeIn() {
 	setup();
 	ctx.resume();
 	playing = true;
+	if (ctx.state === 'running') stopWaiting();
 	master.gain.setTargetAtTime(0.6, ctx.currentTime, 0.6);
 	setTimeout(critter, 800);
 	schedule();
@@ -150,6 +155,107 @@ function fadeOut() {
 	playing = false;
 	clearTimeout(timer);
 	if (ctx) master.gain.setTargetAtTime(0, ctx.currentTime, 0.2);
+}
+
+// A short knock of noise: the latch
+function latch(at, frequency) {
+	const source = ctx.createBufferSource();
+	source.buffer = noise(0.06, false);
+	const band = ctx.createBiquadFilter();
+	band.type = 'bandpass';
+	band.frequency.value = frequency;
+	band.Q.value = 4;
+	const gain = ctx.createGain();
+	gain.gain.setValueAtTime(0.6, at);
+	gain.gain.exponentialRampToValueAtTime(0.001, at + 0.05);
+	source.connect(band).connect(gain).connect(effects);
+	source.start(at);
+}
+
+// A sawtooth that rises and falls through a narrow, opening filter, fluttering 21 times a second
+function creak(at, length) {
+	const oscillator = ctx.createOscillator();
+	oscillator.type = 'sawtooth';
+	oscillator.frequency.setValueAtTime(70, at);
+	oscillator.frequency.linearRampToValueAtTime(118, at + length * 0.6);
+	oscillator.frequency.linearRampToValueAtTime(92, at + length);
+
+	const band = ctx.createBiquadFilter();
+	band.type = 'bandpass';
+	band.Q.value = 9;
+	band.frequency.setValueAtTime(650, at);
+	band.frequency.linearRampToValueAtTime(1200, at + length);
+
+	const flutter = ctx.createOscillator();
+	flutter.frequency.value = 21;
+	const flutterDepth = ctx.createGain();
+	flutterDepth.gain.value = 0.5;
+
+	const gain = ctx.createGain();
+	gain.gain.setValueAtTime(0, at);
+	gain.gain.linearRampToValueAtTime(0.13, at + 0.06);
+	gain.gain.linearRampToValueAtTime(0, at + length);
+
+	flutter.connect(flutterDepth).connect(gain.gain);
+	oscillator.connect(band).connect(gain).connect(effects);
+	oscillator.start(at);
+	oscillator.stop(at + length + 0.05);
+	flutter.start(at);
+	flutter.stop(at + length + 0.05);
+}
+
+// Low noise, quickly gone: the door meets its frame
+function thud(at) {
+	const source = ctx.createBufferSource();
+	source.buffer = noise(0.25, false);
+	const low = ctx.createBiquadFilter();
+	low.type = 'lowpass';
+	low.frequency.value = 180;
+	const gain = ctx.createGain();
+	gain.gain.setValueAtTime(1.2, at);
+	gain.gain.exponentialRampToValueAtTime(0.001, at + 0.2);
+	source.connect(low).connect(gain).connect(effects);
+	source.start(at);
+}
+
+// A door opens: the latch gives, then the hinge creaks as it swings (like the door: a 0.12s nudge,
+// then the swing). Only while the garden plays; the page changes before the creak ends
+export function doorOpen() {
+	if (!playing) return;
+	const t = ctx.currentTime;
+	latch(t, 2400);
+	creak(t + 0.12, 0.75);
+}
+
+// The design's closing sequence, 0.28s earlier, so the thud lands as the door meets its frame (0.5s)
+function closeSounds() {
+	const t = ctx.currentTime;
+	creak(t + 0.02, 0.4);
+	thud(t + 0.5);
+	latch(t + 0.52, 1800);
+}
+
+// A door closes on the way back. This can come before any press on the page:
+// play only if the browser already lets the audio run, otherwise stay silent
+export function doorClose() {
+	if (!on) return;
+	if (!ctx) {
+		if (navigator.getAutoplayPolicy?.('audiocontext') === 'disallowed') return;
+		setup();
+	}
+	if (ctx.state === 'running') return closeSounds();
+	// Still starting, or back from the back-forward cache: play only if it runs within a moment
+	const moment = new Promise((resolve) => setTimeout(resolve, 150));
+	Promise.race([ctx.resume(), moment])
+		.then(() => {
+			if (ctx.state === 'running') closeSounds();
+		})
+		.catch(() => {});
+}
+
+// A soft click for Flip, Flip back and the menu button
+export function click() {
+	if (playing) tone('triangle', 880, 520, ctx.currentTime, 0.1, 0.1, 0, effects);
 }
 
 function setOn(next) {
