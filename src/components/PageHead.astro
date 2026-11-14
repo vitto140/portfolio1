@@ -5,14 +5,15 @@ interface Props {
 	lede: string;
 	/** The hedge wall: a hedge rising from the bottom of the head */
 	edge?: 'hedge';
-	/** The washing line: a sunny head with the sun in the corner */
-	sky?: 'sunny';
+	/** The washing line: a sunny head with the sun in the corner.
+	    The greenhouse: glass panes with thin frame lines */
+	sky?: 'sunny' | 'glass';
 }
 
 // Both are the garden design's full-width head. They need a page with BaseLayout's bleed,
 // since the head brings its own .wrapper
 const { eyebrow, title, lede, edge, sky } = Astro.props;
-const garden = edge === 'hedge' || sky === 'sunny';
+const garden = edge === 'hedge' || sky !== undefined;
 ---
 
 <header class:list={[edge, sky, { garden }]}>
@@ -133,5 +134,24 @@ const garden = edge === 'hedge' || sky === 'sunny';
 		--sunny: var(--color-lavender);
 		--sun-glow: var(--color-sky);
 		--halo: 0 0 0.1em var(--color-bg), 0 0 0.2em var(--color-bg), 0 0 0.3em var(--color-bg);
+	}
+
+	/* The greenhouse: panes 6rem wide and 5rem high, framed by 0.125rem lines in 70% surface,
+	   over sky fading to lavender. Muted is at least 5.0:1 by day and 6.89:1 at night */
+	.glass {
+		background:
+			linear-gradient(
+					90deg,
+					transparent calc(100% - 0.125rem),
+					color-mix(in srgb, var(--color-surface) 70%, transparent) 0
+				)
+				0 0 / 6rem 100%,
+			linear-gradient(
+					180deg,
+					transparent calc(100% - 0.125rem),
+					color-mix(in srgb, var(--color-surface) 70%, transparent) 0
+				)
+				0 0 / 100% 5rem,
+			linear-gradient(160deg, var(--color-sky), var(--color-lavender));
 	}
 </style>
