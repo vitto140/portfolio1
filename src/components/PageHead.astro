@@ -3,21 +3,26 @@ interface Props {
 	eyebrow: string;
 	title: string;
 	lede: string;
-	/** A garden edge under the head, as decoration */
+	/** The garden design's full-width head with a hedge rising from the bottom.
+	    Needs a page with BaseLayout's bleed, since it brings its own .wrapper */
 	edge?: 'hedge';
 	/** A coloured sky behind the head: sunny by day, dusk at night */
 	sky?: 'sunny';
 }
 
 const { eyebrow, title, lede, edge, sky } = Astro.props;
+const garden = edge === 'hedge';
 ---
 
-<header class:list={[edge, sky]}>
-	<hgroup>
-		<p class="eyebrow">{eyebrow}</p>
-		<h1>{title}</h1>
-	</hgroup>
-	<p class="lede">{lede}</p>
+<header class:list={[edge, sky, { garden }]}>
+	<div class:list={['inner', { wrapper: garden }]}>
+		<hgroup>
+			<p class="eyebrow">{eyebrow}</p>
+			<h1>{title}</h1>
+		</hgroup>
+		<p class="lede">{lede}</p>
+	</div>
+	{edge === 'hedge' && <div class="hedge-edge" aria-hidden="true"></div>}
 </header>
 
 <style>
@@ -39,17 +44,54 @@ const { eyebrow, title, lede, edge, sky } = Astro.props;
 		font-size: var(--step-1);
 	}
 
-	/* A hedge strip under the text with a scalloped bottom: a flat 1rem band,
-	   then half circles 1.5rem wide hanging from it. CSS only, so nothing to read out */
-	.hedge::after {
-		content: '';
-		display: block;
-		block-size: 1.75rem;
-		margin-block-start: var(--space-m);
-		background:
-			linear-gradient(var(--color-hedge) 0 0) top / 100% 1rem no-repeat,
-			radial-gradient(circle at 50% 0, var(--color-hedge) 0.75rem, transparent calc(0.75rem + 0.0625rem))
-				0 1rem / 1.5rem 0.75rem repeat-x;
+	/* The garden design's page head: full width, a big title, the crumb in spaced capitals.
+	   Muted on the sky to sage gradient is at least 4.91:1 by day */
+	.garden {
+		position: relative;
+		overflow: hidden;
+		padding-block: var(--space-2xl);
+	}
+
+	.garden .inner {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		gap: var(--space-s);
+	}
+
+	.garden hgroup {
+		gap: var(--space-s);
+	}
+
+	.garden h1 {
+		font-size: clamp(3rem, 1rem + 10vw, 8rem);
+		font-weight: 800;
+		letter-spacing: -0.045em;
+		line-height: 0.9;
+	}
+
+	.garden .eyebrow {
+		letter-spacing: 0.08em;
+	}
+
+	.garden .lede {
+		max-inline-size: 34ch;
+		margin-block-start: 0;
+		line-height: 1.35;
+	}
+
+	/* The hedge wall: sky fading to sage, with the round top of the hedge rising from the bottom.
+	   The section under the head is hedge, so the bumps join it */
+	.hedge {
+		background: linear-gradient(180deg, var(--color-sky), var(--color-sage));
+	}
+
+	.hedge-edge {
+		position: absolute;
+		inset: auto 0 0 0;
+		block-size: 3rem;
+		background: radial-gradient(circle at 1.5rem 3rem, var(--color-hedge) 1.6rem, transparent 1.65rem) 0 0 / 3rem
+			3rem repeat-x;
 	}
 
 	/* Sunny by day. Muted on butter is 5.51:1 */
