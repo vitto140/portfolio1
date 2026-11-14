@@ -12,94 +12,215 @@ const works = (await getCollection('works'))
 const passions = (await getCollection('passions')).sort((a, b) =>
 	a.data.title.localeCompare(b.data.title),
 );
+
+// 36 stars in the top 55% of the hero, only visible at night. Seeded, so every build is the same
+let seed = 11;
+const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+const stars = Array.from({ length: 36 }, () => ({
+	left: Math.round(rnd() * 1000) / 10,
+	top: Math.round(rnd() * 550) / 10,
+}));
 ---
 
 <BaseLayout
 	title="Vittoria Romano"
 	description="Portfolio of Vittoria Romano, web development student: works, passions and how to reach me."
+	bleed
 >
-	<section class="hero flow">
-		<h1>Vittoria Romano</h1>
-		<p>I'm a web development student who builds mobile first.</p>
-		<p><a href={`${base}about/`}>About me</a></p>
+	<section class="hero">
+		{stars.map(({ left, top }) => <span class="star" aria-hidden="true" style={`left: ${left}%; top: ${top}%`} />)}
+		<div class="sun" aria-hidden="true"></div>
+		<div class="wrapper hero-text">
+			<h1><span class="line">Vittoria</span> <span class="line">Romano</span></h1>
+			<div class="lede">
+				<p>I'm a web development student who builds mobile first.</p>
+				<a class="cta" href={`${base}about/`}>About me</a>
+			</div>
+		</div>
 		<Meadow />
 	</section>
 
-	<section class="flow">
-		<h2>Selected works</h2>
-		<ul>
-			{
-				works.map((work) => (
-					<li>
-						<WorkCard
-							title={work.data.title}
-							summary={work.data.summary}
-							year={work.data.year}
-							tags={work.data.tags}
-							href={`${base}works/${work.id}/`}
-							cover={work.data.cover}
-							coverAlt={work.data.coverAlt}
-							headingLevel={3}
-						/>
-					</li>
-				))
-			}
-		</ul>
-		<p><a href={`${base}works/`}>All works</a></p>
+	<section class="room room-works">
+		<div class="wrapper">
+			<h2>Selected works</h2>
+			<ul>
+				{
+					works.map((work) => (
+						<li>
+							<WorkCard
+								title={work.data.title}
+								summary={work.data.summary}
+								year={work.data.year}
+								tags={work.data.tags}
+								href={`${base}works/${work.id}/`}
+								cover={work.data.cover}
+								coverAlt={work.data.coverAlt}
+								headingLevel={3}
+							/>
+						</li>
+					))
+				}
+			</ul>
+			<p><a href={`${base}works/`}>All works</a></p>
+		</div>
 	</section>
 
-	<section class="flow">
-		<h2>Off the screen</h2>
-		<ul>
-			{
-				passions.map((passion) => (
-					<li>
-						<PassionCard
-							title={passion.data.title}
-							summary={passion.data.summary}
-							href={`${base}passions/${passion.id}/`}
-							cover={passion.data.cover}
-							coverAlt={passion.data.coverAlt}
-							headingLevel={3}
-						/>
-					</li>
-				))
-			}
-		</ul>
-		<p><a href={`${base}passions/`}>All passions</a></p>
+	<section class="room">
+		<div class="wrapper">
+			<h2>Off the screen</h2>
+			<ul>
+				{
+					passions.map((passion) => (
+						<li>
+							<PassionCard
+								title={passion.data.title}
+								summary={passion.data.summary}
+								href={`${base}passions/${passion.id}/`}
+								cover={passion.data.cover}
+								coverAlt={passion.data.coverAlt}
+								headingLevel={3}
+							/>
+						</li>
+					))
+				}
+			</ul>
+			<p><a href={`${base}passions/`}>All passions</a></p>
+		</div>
 	</section>
 </BaseLayout>
 
 <style>
-	/* Fill the screen below the header and main's top padding.
-	   4.8rem is the closed header at 320px: name and menu button on one row.
-	   The meadow sits behind the hero; the padding keeps the text above it,
-	   so the text never covers the moon or the flowers.
-	   Meadow: 9rem at 320px -> 18rem at 1400px */
+	/* The meadow hero from the garden design: sky fading to sage, a sun (a moon at night),
+	   stars at night and the meadow along the bottom. Fills the screen below the header;
+	   4.8rem is the closed header at 320px. The 12rem bottom padding keeps the text above the meadow */
 	.hero {
-		--meadow-block-size: clamp(9rem, 6.333rem + 13.333vw, 18rem);
-
 		position: relative;
 		isolation: isolate;
 		display: grid;
-		align-content: center;
-		min-block-size: calc(100svh - 4.8rem - var(--space-xl));
-		padding-block-end: var(--meadow-block-size);
+		align-items: center;
+		min-block-size: calc(100svh - 4.8rem);
+		padding-block: var(--space-l) 12rem;
+		overflow: hidden;
+		background: linear-gradient(180deg, var(--color-sky) 0%, var(--color-bg) 62%, var(--color-sage) 100%);
+	}
+
+	/* --halo is only set at night: a soft edge in the night background around every letter,
+	   so text crossing the moon or a star keeps 4.5:1 */
+	.hero-text {
+		position: relative;
+		z-index: 2;
+		display: grid;
+		gap: var(--space-m);
+		text-shadow: var(--halo, none);
 	}
 
 	.hero h1 {
-		font-size: clamp(3rem, 1.519rem + 7.407vw, 8rem);
-		line-height: 0.95;
+		font-size: clamp(3.4rem, 1rem + 13vw, 11rem);
+		font-weight: 800;
+		letter-spacing: -0.045em;
+		line-height: 0.88;
 	}
 
-	section + section {
-		margin-block-start: var(--space-2xl);
+	.line {
+		display: block;
+	}
+
+	.line + .line {
+		padding-inline-start: 0.4em;
+	}
+
+	.lede {
+		display: grid;
+		gap: var(--space-s);
+		max-inline-size: 30rem;
+	}
+
+	.lede p {
+		font-size: var(--step-1);
+		line-height: 1.35;
+	}
+
+	/* Ink on the accent is 5.21:1. The pill is its own background, so no halo */
+	.cta {
+		justify-self: start;
+		text-shadow: none;
+		padding: 0.75rem 1.25rem;
+		border-radius: var(--radius-pill);
+		background-color: var(--color-accent);
+		color: var(--color-on-pop);
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.cta:hover {
+		box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--color-accent) 35%, transparent);
+	}
+
+	/* The sun: butter with a butter glow. At night the same disc is the moon, with a sky glow */
+	.sun {
+		position: absolute;
+		inset-block-start: 12%;
+		inset-inline-end: 7%;
+		z-index: 0;
+		inline-size: clamp(8rem, 26vw, 20rem);
+		aspect-ratio: 1;
+		border-radius: 50%;
+		background-color: var(--color-butter);
+		box-shadow: 0 0 4rem 2rem var(--sun-glow, var(--color-butter));
+	}
+
+	.star {
+		position: absolute;
+		z-index: 0;
+		inline-size: 0.2rem;
+		block-size: 0.2rem;
+		border-radius: 50%;
+		background-color: var(--color-butter);
+		opacity: 0;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .hero-text {
+			--halo: 0 0 0.1em var(--color-bg), 0 0 0.2em var(--color-bg), 0 0 0.3em var(--color-bg);
+		}
+
+		:global(:root:not([data-theme='light'])) .sun {
+			--sun-glow: var(--color-sky);
+		}
+
+		:global(:root:not([data-theme='light'])) .star {
+			opacity: 1;
+		}
+	}
+
+	:global(:root[data-theme='dark']) .hero-text {
+		--halo: 0 0 0.1em var(--color-bg), 0 0 0.2em var(--color-bg), 0 0 0.3em var(--color-bg);
+	}
+
+	:global(:root[data-theme='dark']) .sun {
+		--sun-glow: var(--color-sky);
+	}
+
+	:global(:root[data-theme='dark']) .star {
+		opacity: 1;
+	}
+
+	.room {
+		padding-block: var(--space-2xl);
+	}
+
+	.room > .wrapper {
+		display: grid;
+		gap: var(--space-l);
+	}
+
+	.room-works {
+		background-color: var(--color-sage);
 	}
 
 	ul {
 		display: grid;
 		gap: var(--space-m);
-		margin-block-start: var(--space-l);
 		padding: 0;
 		list-style: none;
 	}
