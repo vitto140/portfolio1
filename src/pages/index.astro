@@ -17,8 +17,8 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 let seed = 11;
 const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
 const stars = Array.from({ length: 36 }, () => ({
-	left: Math.round(rnd() * 1000) / 10,
-	top: Math.round(rnd() * 550) / 10,
+	inlineStart: Math.round(rnd() * 1000) / 10,
+	blockStart: Math.round(rnd() * 550) / 10,
 }));
 ---
 
@@ -28,7 +28,15 @@ const stars = Array.from({ length: 36 }, () => ({
 	bleed
 >
 	<section class="hero">
-		{stars.map(({ left, top }) => <span class="star" aria-hidden="true" style={`left: ${left}%; top: ${top}%`} />)}
+		{
+			stars.map(({ inlineStart, blockStart }) => (
+				<span
+					class="star"
+					aria-hidden="true"
+					style={`inset-inline-start: ${inlineStart}%; inset-block-start: ${blockStart}%`}
+				/>
+			))
+		}
 		<div class="sun" aria-hidden="true"></div>
 		<div class="wrapper hero-text">
 			<h1><span class="line">Vittoria</span> <span class="line">Romano</span></h1>
