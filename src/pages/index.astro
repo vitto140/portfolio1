@@ -6,9 +6,9 @@ import PassionCard from '../components/PassionCard.astro';
 import Meadow from '../components/Meadow.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
-const works = (await getCollection('works'))
-	.sort((a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title))
-	.slice(0, 3);
+const works = (await getCollection('works')).sort(
+	(a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title),
+);
 const passions = (await getCollection('passions')).sort((a, b) =>
 	a.data.title.localeCompare(b.data.title),
 );
@@ -125,8 +125,11 @@ const stars = Array.from({ length: 36 }, () => ({
 		display: block;
 	}
 
+	/* Bricolage Grotesque has no italic, so the browser slants it, as in the design */
 	.line + .line {
 		padding-inline-start: 0.4em;
+		font-weight: 300;
+		font-style: italic;
 	}
 
 	.lede {
@@ -220,7 +223,7 @@ const stars = Array.from({ length: 36 }, () => ({
 
 	ul {
 		display: grid;
-		gap: var(--space-m);
+		gap: var(--space-xl) var(--space-l);
 		padding: 0;
 		list-style: none;
 	}
