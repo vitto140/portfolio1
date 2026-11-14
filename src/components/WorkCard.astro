@@ -155,6 +155,20 @@ const coverSizes =
 		box-shadow: 0 0.12rem 0 var(--color-accent-strong);
 	}
 
+	/* The door nudges open a little on its hinge when you hover the card or tab to it.
+	   It springs open with a small overshoot and eases shut again, as in the design */
+	@media (prefers-reduced-motion: no-preference) {
+		.door {
+			transition: rotate 0.35s ease;
+		}
+
+		.work:hover .door,
+		.work:has(.title a:focus-visible) .door {
+			rotate: y -8deg;
+			transition: rotate 0.4s cubic-bezier(0.3, 1.4, 0.5, 1);
+		}
+	}
+
 	/* The shade darkens the door towards its free edge as it swings. Hidden while closed */
 	.shade {
 		position: absolute;
