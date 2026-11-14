@@ -37,6 +37,8 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 		/>
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<!-- For scripts that must run before the first frame, like a page's view transition -->
+		<slot name="head" />
 	</head>
 	<body>
 		<Header />

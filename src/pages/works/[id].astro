@@ -18,6 +18,52 @@ const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 ---
 
 <BaseLayout title={work.data.title} description={work.data.summary}>
+	<Fragment slot="head">
+		<!-- Grow this page out of the doorway it was opened from, like the design's clipFrom() and full().
+		     Inline in the head, so it is listening before the first frame. Without view transitions,
+		     without a saved door for this work, or with reduced motion, the page simply opens -->
+		<script is:inline>
+			if ('onpagereveal' in window) {
+				window.addEventListener('pagereveal', (event) => {
+					let door = null;
+					try {
+						door = JSON.parse(sessionStorage.getItem('door'));
+						sessionStorage.removeItem('door');
+					} catch {
+						// No storage: open the page without the effect
+					}
+
+					const transition = event.viewTransition;
+					if (!transition) return;
+
+					const here = location.pathname.split('/').filter(Boolean).at(-1);
+					const motion = matchMedia('(prefers-reduced-motion: no-preference)').matches;
+					if (!door || door.work !== here || !motion) {
+						transition.skipTransition();
+						return;
+					}
+
+					// The doorway's arch as an inset with rounded corners, in rem, like the design's clipFrom()
+					const px = parseFloat(getComputedStyle(document.documentElement).fontSize);
+					const rem = (n) => `${n / px}rem`;
+					const right = innerWidth - door.left - door.width;
+					const bottom = innerHeight - door.top - door.height;
+					const rx = rem(door.width / 2);
+					const ry = rem(door.height * 0.3);
+					const from = `inset(${rem(door.top)} ${rem(right)} ${rem(bottom)} ${rem(door.left)} round ${rx} ${rx} 0.25rem 0.25rem / ${ry} ${ry} 0.25rem 0.25rem)`;
+					const to = 'inset(0 0 0 0 round 0 0 0 0 / 0 0 0 0)';
+
+					// 0.9s with the design's expo.inOut, written as a CSS curve
+					transition.ready.then(() => {
+						document.documentElement.animate(
+							{ clipPath: [from, to] },
+							{ duration: 900, easing: 'cubic-bezier(0.87, 0, 0.13, 1)', pseudoElement: '::view-transition-new(root)' },
+						);
+					});
+				});
+			}
+		</script>
+	</Fragment>
 	<p><a class="back" href={`${base}works/`}>← All works</a></p>
 	<h1>{work.data.title}</h1>
 	<p class="summary">{work.data.summary}</p>

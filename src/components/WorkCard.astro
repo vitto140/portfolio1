@@ -79,6 +79,10 @@ const coverSizes =
 			const opening = card.querySelector<HTMLElement>('.opening')!;
 			const glow = card.querySelector('.glow');
 
+			// Bring the whole door into view first (with Enter the browser may have scrolled it away),
+			// centred and at once, so you see it swing and the work page grows out of it on screen
+			card.querySelector('.arch')!.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'instant' });
+
 			// Where the doorway is, so the work page can grow out of it (step 5)
 			const rect = opening.getBoundingClientRect();
 			try {
