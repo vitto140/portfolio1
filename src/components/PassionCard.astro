@@ -13,24 +13,128 @@ interface Props {
 
 const { title, summary, href, cover, coverAlt, headingLevel = 2 } = Astro.props;
 const Heading = `h${headingLevel}`;
+// The passion's id is the last part of its link, e.g. /passions/cooking/ -> cooking; it names the back
+const backId = `back-${href.split('/').filter(Boolean).at(-1)}`;
 ---
 
-<!-- A pegged polaroid from the garden design: a wooden peg, a light frame, a square photo and the caption.
-     The peg is decoration only. The title link stretches over the whole polaroid, so the card is one link -->
+<!-- A pegged polaroid from the garden design: a wooden peg and two faces. The front has the photo and
+     the title, the back (blossom) the title, the summary and a Read more link to the passion page.
+     Without JavaScript nothing is hidden: the back simply shows under the front. Once the script runs,
+     the faces lie back to back and the Flip buttons (hidden until then) turn the card over -->
 <article class="polaroid">
 	<span class="peg" aria-hidden="true"></span>
-	<div class="face">
-		<Image
-			class="cover"
-			src={cover}
-			alt={coverAlt}
-			widths={[320, 640, 960]}
-			sizes="(min-width: 72rem) 14.25rem, (min-width: 64em) calc(25vw - 3.75rem), (min-width: 36em) calc(50vw - 3.5rem), calc(100vw - 3.5rem)"
-		/>
-		<Heading class="title"><a href={href}>{title}</a></Heading>
-		<p>{summary}</p>
+	<div class="flipper">
+		<div class="face front">
+			<Image
+				class="cover"
+				src={cover}
+				alt={coverAlt}
+				widths={[320, 640, 960]}
+				sizes="(min-width: 72rem) 14.25rem, (min-width: 64em) calc(25vw - 3.75rem), (min-width: 36em) calc(50vw - 3.5rem), calc(100vw - 3.5rem)"
+			/>
+			<div class="row">
+				<Heading class="title">{title}</Heading>
+				<button type="button" class="flip" aria-expanded="false" aria-controls={backId} hidden>
+					Flip<span class="visually-hidden"> {title}</span>
+				</button>
+			</div>
+		</div>
+		<div class="face back" id={backId}>
+			<Heading class="title">{title}</Heading>
+			<p>{summary}</p>
+			<div class="row">
+				<a class="more" href={href}>Read more<span class="visually-hidden"> about {title}</span></a>
+				<button type="button" class="flip" hidden>
+					Flip back<span class="visually-hidden"> {title}</span>
+				</button>
+			</div>
+		</div>
 	</div>
 </article>
+
+<script>
+	import { gsap } from 'gsap';
+
+	// Turn the polaroids over. Only once this runs do the Flip buttons appear and the faces lie
+	// back to back; the side facing away is inert, so keyboard and screen readers skip it
+	const cards = [...document.querySelectorAll<HTMLElement>('.polaroid')];
+
+	cards.forEach((card) => {
+		card.dataset.flippable = '';
+		card.querySelector<HTMLElement>('.back')!.inert = true;
+		card.querySelectorAll<HTMLButtonElement>('.flip').forEach((button) => (button.hidden = false));
+	});
+
+	// Swap which side is showing: data-flipped (CSS turns the flipper), inert, aria-expanded,
+	// and focus moves to the button on the side that is now showing
+	const swapSides = (card: HTMLElement, showBack: boolean) => {
+		const [toBack, toFront] = card.querySelectorAll<HTMLButtonElement>('.flip');
+		card.toggleAttribute('data-flipped', showBack);
+		card.querySelector<HTMLElement>('.front')!.inert = showBack;
+		card.querySelector<HTMLElement>('.back')!.inert = !showBack;
+		toBack.setAttribute('aria-expanded', String(showBack));
+		(showBack ? toFront : toBack).focus();
+	};
+
+	const mm = gsap.matchMedia();
+
+	mm.add(
+		{ motion: '(prefers-reduced-motion: no-preference)', still: '(prefers-reduced-motion: reduce)' },
+		(context) => {
+			const motion = context.conditions?.motion;
+			// A card that is turning ignores more clicks, so a double click can't turn it straight back
+			const turning = new WeakSet<HTMLElement>();
+
+			// Like the design: the flipper turns over with a little overshoot while the card
+			// swings a few degrees on its peg and back. GSAP lets go at the end, so CSS holds the side.
+			// Added to the context by name, so it runs on each click (and is cleaned up with the media query)
+			const turn = context.add('turn', (card: HTMLElement, showBack: boolean) => {
+				const flipper = card.querySelector<HTMLElement>('.flipper')!;
+				turning.add(card);
+				gsap
+					.timeline({
+						onComplete: () => {
+							gsap.set([flipper, card], { clearProps: 'transform' });
+							turning.delete(card);
+						},
+					})
+					.fromTo(
+						flipper,
+						{ rotateY: showBack ? 0 : 180 },
+						{ rotateY: showBack ? 180 : 0, duration: 0.75, ease: 'back.out(1.4)' },
+						0,
+					)
+					.to(card, { rotation: showBack ? 4 : -3, duration: 0.25, yoyo: true, repeat: 1, ease: 'sine.inOut' }, 0);
+			});
+
+			const onClick = (event: MouseEvent) => {
+				const button = (event.target as Element).closest<HTMLButtonElement>('.polaroid .flip');
+				// The second click of a double click (detail 2) doesn't count, also with reduced motion
+				if (!button || event.detail > 1) return;
+				const card = button.closest<HTMLElement>('.polaroid')!;
+				if (turning.has(card)) return;
+				const showBack = !card.hasAttribute('data-flipped');
+				swapSides(card, showBack);
+				// With reduced motion the card turns over at once: CSS does it, nothing moves
+				if (motion) turn(card, showBack);
+			};
+
+			// A press on a turning card would land on the side that just went inert and take focus
+			// away; keep focus on the button that is now showing
+			const onMouseDown = (event: MouseEvent) => {
+				const card = (event.target as Element).closest<HTMLElement>('.polaroid');
+				if (card && turning.has(card)) event.preventDefault();
+			};
+
+			document.addEventListener('click', onClick);
+			document.addEventListener('mousedown', onMouseDown);
+			return () => {
+				document.removeEventListener('click', onClick);
+				document.removeEventListener('mousedown', onMouseDown);
+			};
+		},
+	);
+</script>
 
 <style>
 	/* Each polaroid turns around its peg, tilting a different way in a repeating set of four */
@@ -65,7 +169,13 @@ const Heading = `h${headingLevel}`;
 		pointer-events: none;
 	}
 
-	/* The light frame with a hairline edge in ink */
+	/* The two faces of the polaroid. Without JavaScript the back sits under the front */
+	.flipper {
+		display: grid;
+		gap: 0.6rem;
+	}
+
+	/* A face: the light frame with a hairline edge in ink */
 	.face {
 		display: grid;
 		gap: 0.6rem;
@@ -86,31 +196,76 @@ const Heading = `h${headingLevel}`;
 		border-radius: 0.125rem;
 	}
 
+	/* The back, in blossom like the design. Ink on blossom is 11.09:1 by day and 11.68:1 at night */
+	.back {
+		align-content: space-between;
+		background-color: var(--color-blossom);
+	}
+
 	.title {
 		font-size: var(--step-1);
 		font-weight: 700;
 	}
 
-	.title a {
-		text-decoration: none;
+	.back .title {
+		margin-block-start: 0.5rem;
 	}
 
-	/* The link covers the whole polaroid */
-	.title a::after {
-		content: '';
-		position: absolute;
-		inset: 0;
-		z-index: 3;
+	/* Title and Flip on the front, Read more and Flip back on the back */
+	.row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1rem;
+		align-items: center;
+		justify-content: space-between;
 	}
 
-	/* Draw the focus ring around the frame instead of around the title */
-	.title a:focus-visible {
+	/* The design's dark pill. Padding makes it 2.75rem high (1lh is its own line height).
+	   No display here, so the hidden attribute keeps it out until the script runs.
+	   Background on ink is 12.84:1 by day and 15.12:1 at night */
+	.flip {
+		padding-block: calc((2.75rem - 1lh) / 2);
+		padding-inline: 0.9rem;
+		border: 0;
+		border-radius: var(--radius-pill);
+		background-color: var(--color-ink);
+		color: var(--color-bg);
+		font: inherit;
+		font-size: var(--step--1);
+		cursor: pointer;
+	}
+
+	/* Once the script runs: the faces share one grid cell, back to back, in 3D like the design.
+	   Each face hides its back side, and the back starts turned away */
+	.polaroid[data-flippable] {
+		perspective: 60rem;
+	}
+
+	.polaroid[data-flippable] .flipper {
+		transform-style: preserve-3d;
+	}
+
+	.polaroid[data-flippable] .face {
+		grid-area: 1 / 1;
+		backface-visibility: hidden;
+	}
+
+	.polaroid[data-flippable] .back {
+		transform: rotateY(180deg);
+	}
+
+	.polaroid[data-flipped] .flipper {
+		transform: rotateY(180deg);
+	}
+
+	/* Draw the focus ring of the Read more link around the whole polaroid instead */
+	.more:focus-visible {
 		outline: none;
 	}
 
 	/* The ring sits on its own layer over the frame, above the peg (z-index 2) and the rope,
-	   so none of it is hidden. Clicks pass through it to the link */
-	.polaroid:has(.title a:focus-visible)::after {
+	   so none of it is hidden. Clicks pass through it */
+	.polaroid:has(.more:focus-visible)::after {
 		content: '';
 		position: absolute;
 		inset: 0;
