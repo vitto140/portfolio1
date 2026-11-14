@@ -45,4 +45,11 @@ const passions = (await getCollection('passions')).sort((a, b) =>
 		padding: 0;
 		list-style: none;
 	}
+
+	/* Two side by side from 36em: one card across the full width is too wide */
+	@media (min-width: 36em) {
+		ul {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
 </style>
