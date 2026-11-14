@@ -70,6 +70,22 @@ const coverSizes =
 
 	const linkOf = (card: HTMLElement) => card.querySelector<HTMLAnchorElement>('.title a');
 
+	// Tabbing to a door: the browser only scrolls the focused link (the title) into view, which can
+	// leave the door and its focus ring above the screen. Bring the door into view with it, at once.
+	// If door and title don't fit on the screen together, keep the title in view with as much door as fits
+	document.addEventListener('focusin', (event) => {
+		const link = (event.target as Element).closest?.<HTMLAnchorElement>('.work .title a');
+		if (!link?.matches(':focus-visible')) return;
+		const arch = link.closest('.work')!.querySelector('.arch')!.getBoundingClientRect();
+		const title = link.closest('.title')!.getBoundingClientRect();
+		const space = parseFloat(getComputedStyle(document.documentElement).fontSize); // 1rem of air
+		const top = arch.top - space;
+		const bottom = title.bottom + space;
+		if (top >= 0 && bottom <= innerHeight) return;
+		const fits = bottom - top <= innerHeight;
+		scrollBy({ top: fits && top < 0 ? top : bottom - innerHeight, behavior: 'instant' });
+	});
+
 	const mm = gsap.matchMedia();
 
 	mm.add(
