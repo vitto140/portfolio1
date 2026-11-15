@@ -54,6 +54,7 @@ const backId = `back-${href.split('/').filter(Boolean).at(-1)}`;
 
 <script>
 	import { gsap } from 'gsap';
+	import { click } from '../scripts/sound.js';
 
 	// Turn the polaroids over. Only once this runs do the Flip buttons appear and the faces lie
 	// back to back; the side facing away is inert, so keyboard and screen readers skip it
@@ -115,6 +116,7 @@ const backId = `back-${href.split('/').filter(Boolean).at(-1)}`;
 				if (turning.has(card)) return;
 				const showBack = !card.hasAttribute('data-flipped');
 				swapSides(card, showBack);
+				click();
 				// With reduced motion the card turns over at once: CSS does it, nothing moves
 				if (motion) turn(card, showBack);
 			};

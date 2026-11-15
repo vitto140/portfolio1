@@ -53,6 +53,7 @@ const coverSizes =
 
 <script>
 	import { gsap } from 'gsap';
+	import { doorOpen, doorClose } from '../scripts/sound.js';
 
 	// The card of the work page we just came back from, if any. BaseLayout notes the path of
 	// every page we leave, so this is only set when the previous page was that work page
@@ -118,6 +119,8 @@ const coverSizes =
 				// One door at a time: ignore clicks while a door is opening or closing
 				if (busy) return;
 				busy = true;
+				// The latch and creak, if Sound is on. The door doesn't wait for them
+				doorOpen();
 
 				const card = link.closest<HTMLElement>('.work')!;
 				const door = card.querySelector<HTMLElement>('.door')!;
@@ -171,6 +174,8 @@ const coverSizes =
 			// wideOpen: start from fully open (a fresh page); otherwise from where the door is now
 			const close = (card: HTMLElement, wideOpen: boolean) => {
 				busy = true;
+				// The creak, thud and latch, if Sound is on and the browser allows it on this page yet
+				doorClose();
 				const door = card.querySelector<HTMLElement>('.door')!;
 				const shade = card.querySelector('.shade');
 				const glow = card.querySelector('.glow');
