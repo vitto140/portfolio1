@@ -46,6 +46,15 @@ Content lives in content collections; there is no server, no database and no cli
 - Content (works, passions, socials) comes from the collections in `src/data/`, checked by the schema in `src/content.config.js`. Never hardcode an entry in a page. Why: the schema fails the build instead of shipping broken data.
 - Reuse the existing components (`WorkCard`, `PassionCard`, `BaseLayout`) instead of making a page-only copy. Why: a change in one card must show up everywhere.
 
+### Git
+
+- GitHub Flow: one short-lived branch per piece of work, named `feature/...` or `fix/...`. Nobody commits to `main`. Why: main is always deployable.
+- Stage files by name. Never `git add .` or `git add -A`. Why: keeps unrelated and untracked files (like local previews) out of commits.
+- One commit = one reviewable idea. Subject in the imperative, about 50 characters, no full stop; the body says why. Why: the history is graded, and a commit must be revertable on its own.
+- Never rebase, amend or force-push anything already pushed. Why: rewriting shared history.
+- Pull requests use the template's three headings and are merged with a merge commit, not squash.
+- Tags are annotated: `git tag -a milestone-N -m "..."`, then pushed by name. Why: `git push` does not push tags.
+
 ## Changelog
 
 One line per rule: the date, the rule, and what went wrong that made me add it. Dates are when I first had to correct it (the PR it happened in), or when I took it from the class slides.
@@ -61,3 +70,4 @@ One line per rule: the date, the rule, and what went wrong that made me add it. 
 - 2026-11-15 (PR #16, sound): sound off by default, never on load. Claude's first press turned sound off instead of on.
 - 2026-11-18 (slide 06): the remaining rules (`render(entry)`). Taken from class before anything went wrong.
 - 2026-11-18 (slides 01, 09): the remaining rules (viewport meta, mobile first, `min-width` in `em`, logical properties, one `h1`, alt text). Taken from class before anything went wrong.
+- 2026-11-18 (slides 02, 04): the remaining rules (GitHub Flow, staging by name, commit messages, annotated tags). Taken from class before anything went wrong.
