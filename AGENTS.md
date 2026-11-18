@@ -55,11 +55,34 @@ Content lives in content collections; there is no server, no database and no cli
 - Pull requests use the template's three headings and are merged with a merge commit, not squash.
 - Tags are annotated: `git tag -a milestone-N -m "..."`, then pushed by name. Why: `git push` does not push tags.
 
+## Do not
+
+- Do not add features, sections, utility classes or "nice to haves" that weren't asked for. Why: every extra line is one I have to defend.
+- Do not write or rewrite visible text (bio, project descriptions, headings) unless I gave the words. Why: it's my portfolio and my voice.
+- Do not invent content: no fake projects, dates, links or skills.
+- Do not touch `astro.config.mjs`, `package.json` or the workflow unless the task is about them.
+- Do not skip the checks below because the task looks small, and do not say a check passed without running it.
+- Do not move, rename or commit files the task didn't name.
+
+## Stop and ask
+
+Stop and ask before:
+
+- adding a package, a service or a third-party script
+- adding a new breakpoint
+- changing visible text I did not give you
+- content you don't know (projects, dates, links)
+- anything that only works with a server (forms that send email, databases, logins): this is a static site
+- deleting a file
+
 ## Changelog
 
 One line per rule: the date, the rule, and what went wrong that made me add it. Dates are when I first had to correct it (the PR it happened in), or when I took it from the class slides.
 
 - 2026-10-20 (PR #3/#4, base layout): no `px`, type and spacing from a `clamp()` scale. The plan used fixed steps and `999px`.
+- 2026-10-20 (base layout): no extras. The plan added a skip link, `::selection` styles and utility classes I didn't ask for.
+- 2026-10-20 (base layout): don't touch `astro.config.mjs` unless asked. The plan put the fonts there.
+- 2026-10-30 (PR #7, works collection): don't invent content. Claude made up titles, summaries, years and stacks.
 - 2026-10-31 (PR #9, home content): reuse components. Claude was about to make home-only cards.
 - 2026-11-12 (PR #12, responsive layout): no auto-fit for card lists. Auto-fit chose its own columns.
 - 2026-11-12 (responsive layout): breakpoints from content, not devices. The header broke at 41em, measured, not guessed.
@@ -67,7 +90,9 @@ One line per rule: the date, the rule, and what went wrong that made me add it. 
 - 2026-11-14 (garden pages): touch targets 2.75rem with padding. Some links were smaller.
 - 2026-11-14 (PR #14, works doors): colours only from the tokens. Claude reused other tokens for the doorway instead of new ones.
 - 2026-11-14 (PR #15, passions polaroids): focus ring fully visible. Claude let the first polaroid's ring go past the screen edge.
+- 2026-11-14 (passions polaroids): don't write visible text. An unfinished summary would have been filled in by Claude.
 - 2026-11-15 (PR #16, sound): sound off by default, never on load. Claude's first press turned sound off instead of on.
+- 2026-11-15 (sound): stop and ask before a new breakpoint. The Sound button made the header wrap; I chose 46em out of three options.
 - 2026-11-18 (slide 06): the remaining rules (`render(entry)`). Taken from class before anything went wrong.
 - 2026-11-18 (slides 01, 09): the remaining rules (viewport meta, mobile first, `min-width` in `em`, logical properties, one `h1`, alt text). Taken from class before anything went wrong.
 - 2026-11-18 (slides 02, 04): the remaining rules (GitHub Flow, staging by name, commit messages, annotated tags). Taken from class before anything went wrong.
