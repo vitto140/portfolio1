@@ -14,8 +14,50 @@ Content lives in content collections; there is no server, no database and no cli
 - Commit `package.json` and `package-lock.json`, never `node_modules/` or `dist/`. Why: the lockfile rebuilds the exact tree; `dist/` is built by the workflow.
 - Use the current Astro API: `render(entry)` from `astro:content`, `z` from `astro/zod`, loaders from `astro/loaders`. Never `entry.render()`. Why: removed in Astro 6; agents still suggest it from old training data.
 
+## Conventions
+
+### CSS
+
+- Colours, type sizes and spacing come from the custom properties in the tokens file (`src/styles/tokens.css`). No hex, rgb or hsl values anywhere else. Why: one place to change the palette, and dark mode only works if every colour is a token.
+- No `px` in CSS. Type and spacing use `rem` and the `clamp()` scale; `vw` only inside `clamp()`, never alone. Why: px ignores the user's font-size setting, and `font-size: 4vw` breaks zoom.
+- Mobile first: base styles are for 320px, and media queries use `min-width` only, in `em`. Never `max-width` queries. Why: the smallest screen is the default; em queries respect the user's font size.
+- Breakpoints come from the content: widen the window until the layout breaks. Never a device width like 768px. Reuse the existing breakpoints (36em, 46em, 64em) before adding one. Why: device breakpoints don't match where my content actually breaks.
+- Fluid sizes before a media query: `min()`, `clamp()`, `max-width` in `ch` or `rem`. But no `repeat(auto-fit, minmax(...))` for card lists: the number of columns is a breakpoint I choose. Why: auto-fit picked its own columns in my lists, and I want to decide where they change.
+- Logical properties: `margin-inline`, `padding-block`, `inline-size`, `text-align: start`. Why: they work in every writing direction and are what the class taught.
+- No `!important`. Why: it hides a specificity problem instead of fixing it.
+- Never `outline: none` without a visible replacement focus style on the same element or its wrapper, and the whole focus ring stays on screen and uncovered, also at 320px. Why: keyboard users lose their place.
+- Touch targets at least 2.75rem (44px), made with padding on the link itself. Why: WCAG 2.5.5, and the hit area must be the link.
+
+### Motion and user preferences
+
+- All animation and transitions only inside `@media (prefers-reduced-motion: no-preference)`; GSAP only through `gsap.matchMedia()`. Why: motion is opt-in, so a reduce setting gets a still page without a safety-net override.
+- Dark mode through the tokens under `prefers-color-scheme`, never colours hardcoded in a component. Why: one switch, every component follows.
+- Sound off by default, and only after the user turns it on. Why: autoplaying sound is hostile and blocked by browsers anyway.
+
+### HTML and accessibility
+
+- Never change the HTML structure per screen size; CSS changes the layout. Why: one DOM keeps keyboard order and screen readers the same everywhere.
+- One `h1` per page, headings in order, landmarks (`header`, `nav`, `main`, `footer`). Why: screen reader users navigate by them.
+- Every image has `alt`: describe what it tells, not what it shows; decorative images get `alt=""`. No "image of", no file names. Why: alt is not optional (images lesson).
+- Never `user-scalable=no` or `maximum-scale` in the viewport meta. Why: blocks zoom, fails WCAG 1.4.4.
+
+### Content
+
+- Content (works, passions, socials) comes from the collections in `src/data/`, checked by the schema in `src/content.config.js`. Never hardcode an entry in a page. Why: the schema fails the build instead of shipping broken data.
+- Reuse the existing components (`WorkCard`, `PassionCard`, `BaseLayout`) instead of making a page-only copy. Why: a change in one card must show up everywhere.
+
 ## Changelog
 
 One line per rule: the date, the rule, and what went wrong that made me add it. Dates are when I first had to correct it (the PR it happened in), or when I took it from the class slides.
 
+- 2026-10-20 (PR #3/#4, base layout): no `px`, type and spacing from a `clamp()` scale. The plan used fixed steps and `999px`.
+- 2026-10-31 (PR #9, home content): reuse components. Claude was about to make home-only cards.
+- 2026-11-12 (PR #12, responsive layout): no auto-fit for card lists. Auto-fit chose its own columns.
+- 2026-11-12 (responsive layout): breakpoints from content, not devices. The header broke at 41em, measured, not guessed.
+- 2026-11-14 (PR #13, garden pages): no `!important`, and motion only inside `prefers-reduced-motion: no-preference`. Claude added the class safety net with `!important` on every line.
+- 2026-11-14 (garden pages): touch targets 2.75rem with padding. Some links were smaller.
+- 2026-11-14 (PR #14, works doors): colours only from the tokens. Claude reused other tokens for the doorway instead of new ones.
+- 2026-11-14 (PR #15, passions polaroids): focus ring fully visible. Claude let the first polaroid's ring go past the screen edge.
+- 2026-11-15 (PR #16, sound): sound off by default, never on load. Claude's first press turned sound off instead of on.
 - 2026-11-18 (slide 06): the remaining rules (`render(entry)`). Taken from class before anything went wrong.
+- 2026-11-18 (slides 01, 09): the remaining rules (viewport meta, mobile first, `min-width` in `em`, logical properties, one `h1`, alt text). Taken from class before anything went wrong.
