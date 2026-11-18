@@ -75,6 +75,18 @@ Stop and ask before:
 - anything that only works with a server (forms that send email, databases, logins): this is a static site
 - deleting a file
 
+## How to verify
+
+A task is done only when all of these pass, and you say which ones you ran:
+
+1. `npm run build` passes with no errors or warnings.
+2. `npm run preview` (the built site, not the dev server): the changed pages work under `/portfolio1/`.
+3. In the browser at 320px and 1400px, and at 200% zoom: no horizontal scrollbar, nothing overlaps. Console open: no errors.
+4. With reduced motion emulated (DevTools > Rendering): nothing moves.
+5. Keyboard only: every link and button is reachable and has a visible focus ring.
+6. Search the diff: no hex outside the tokens file, no `px` in CSS, no `!important`, no `max-width` media queries, no hardcoded `href="/`.
+7. `git diff` read before every commit.
+
 ## Changelog
 
 One line per rule: the date, the rule, and what went wrong that made me add it. Dates are when I first had to correct it (the PR it happened in), or when I took it from the class slides.
