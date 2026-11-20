@@ -2,7 +2,7 @@
 
 ## Project
 
-A personal portfolio built with Astro as a static site, to be deployed to GitHub Pages under the base path `/portfolio1/`. The base is not set in `astro.config.mjs` yet; it comes with the deploy branch.
+A personal portfolio built with Astro as a static site, deployed to GitHub Pages at https://vitto140.github.io/portfolio1/. `site` and `base` are set in `astro.config.mjs`, and `.github/workflows/deploy.yml` builds and deploys every push to `main`.
 Content lives in content collections; there is no server, no database and no client framework.
 
 ## Stack & constraints
@@ -41,6 +41,12 @@ Content lives in content collections; there is no server, no database and no cli
 - One `h1` per page, headings in order, landmarks (`header`, `nav`, `main`, `footer`). Why: screen reader users navigate by them.
 - Every image has `alt`: describe what it tells, not what it shows; decorative images get `alt=""`. No "image of", no file names. Why: alt is not optional (images lesson).
 - Never `user-scalable=no` or `maximum-scale` in the viewport meta. Why: blocks zoom, fails WCAG 1.4.4.
+
+### Links, images and paths
+
+- Every internal link and asset URL is built from `import.meta.env.BASE_URL` (the `base` const at the top of each page and component), never a hardcoded `href="/..."`. Why: the site lives under `/portfolio1/`; a root link 404s on GitHub Pages.
+- Every internal URL ends in a slash: `${base}works/`, `${base}works/${work.id}/`. Why: one pattern everywhere, and it matches the folders Astro builds.
+- Images live in `src/` and go through `astro:assets` (`<Image>` or `image()` in the collection schema) with `sizes`. Only favicons go in `public/`. Why: `public/` is copied as-is, never optimised, and a missing file there is a 404 instead of a build error.
 
 ### Content
 
@@ -82,12 +88,13 @@ Stop and ask before:
 A task is done only when all of these pass, and you say which ones you ran:
 
 1. `npm run build` passes with no errors or warnings.
-2. `npm run preview` (the built site, not the dev server): the changed pages work. Until the base is set in `astro.config.mjs` the preview serves at `/`; after that, check them under `/portfolio1/`.
+2. `npm run preview` (the built site, not the dev server): the changed pages work under `http://localhost:4321/portfolio1/`.
 3. In the browser at 320px and 1400px, and at 200% zoom: no horizontal scrollbar, nothing overlaps. Console open: no errors.
 4. With reduced motion emulated (DevTools > Rendering): nothing moves.
 5. Keyboard only: every link and button is reachable and has a visible focus ring.
 6. Search the diff: no hex outside the tokens file, no `px` in CSS, no `!important`, no `max-width` media queries, no hardcoded `href="/`.
 7. `git diff` read before every commit.
+8. After a merge to `main`: the Deploy to GitHub Pages run in the Actions tab is green, and the changed pages work on https://vitto140.github.io/portfolio1/.
 
 ## Changelog
 
@@ -97,6 +104,7 @@ One line per rule: the date, the rule, and what went wrong that made me add it. 
 - 2026-10-20 (base layout): no extras. The plan added a skip link, `::selection` styles and utility classes I didn't ask for.
 - 2026-10-20 (base layout): don't touch `astro.config.mjs` unless asked. The plan put the fonts there.
 - 2026-10-30 (PR #7, works collection): don't invent content. Claude made up titles, summaries, years and stacks.
+- 2026-10-30 (PR #7, works collection): trailing slash on every URL. Nav links were `/works`, cards `/works/…/`.
 - 2026-10-31 (PR #9, home content): reuse components. Claude was about to make home-only cards.
 - 2026-11-12 (PR #12, responsive layout): no auto-fit for card lists. Auto-fit chose its own columns.
 - 2026-11-12 (responsive layout): breakpoints from content, not devices. The header broke at 41em, measured, not guessed.
@@ -114,3 +122,4 @@ One line per rule: the date, the rule, and what went wrong that made me add it. 
 - 2026-11-20 (testing AGENTS.md, attack 2): Project and How to verify say `/portfolio1/` is planned, not live. The agent couldn't pass check 2 because the config has no base yet.
 - 2026-11-20 (testing AGENTS.md, attack 5): stop and ask before creating or switching a branch. The agent ran `git switch -c` from `main` on its own, and AGENTS.md vanished from the folder.
 - 2026-11-20 (testing AGENTS.md, attack 1): contrast 4.5:1 in both modes. The agent noticed `#FF0000` failed on sage, but said my rules didn't cover contrast.
+- 2026-11-20 (slide 11, deployment): links from `BASE_URL`, images through `astro:assets`, and check the live site after a merge. Taken from class before anything went wrong.
