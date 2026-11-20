@@ -2,7 +2,7 @@
 
 ## Project
 
-A personal portfolio built with Astro as a static site, deployed to GitHub Pages at `/portfolio1/`.
+A personal portfolio built with Astro as a static site, to be deployed to GitHub Pages under the base path `/portfolio1/`. The base is not set in `astro.config.mjs` yet; it comes with the deploy branch.
 Content lives in content collections; there is no server, no database and no client framework.
 
 ## Stack & constraints
@@ -26,6 +26,7 @@ Content lives in content collections; there is no server, no database and no cli
 - Logical properties: `margin-inline`, `padding-block`, `inline-size`, `text-align: start`. Why: they work in every writing direction and are what the class taught.
 - No `!important`. Why: it hides a specificity problem instead of fixing it.
 - Never `outline: none` without a visible replacement focus style on the same element or its wrapper, and the whole focus ring stays on screen and uncovered, also at 320px. Why: keyboard users lose their place.
+- Text contrast at least 4.5:1 against its background, 3:1 for `--step-2` and up and for focus rings, in light and dark mode. Check it in the DevTools colour picker. If a colour I ask for fails, stop and ask with a passing alternative. Why: WCAG 1.4.3, and a token can pass on cream and fail in the night garden.
 - Touch targets at least 2.75rem (44px), made with padding on the link itself. Why: WCAG 2.5.5, and the hit area must be the link.
 
 ### Motion and user preferences
@@ -74,13 +75,14 @@ Stop and ask before:
 - content you don't know (projects, dates, links)
 - anything that only works with a server (forms that send email, databases, logins): this is a static site
 - deleting a file
+- creating, switching or deleting a branch. Why: which branch the work goes on is my call, and switching mid-task can drop AGENTS.md from the working tree, so the rules stop applying.
 
 ## How to verify
 
 A task is done only when all of these pass, and you say which ones you ran:
 
 1. `npm run build` passes with no errors or warnings.
-2. `npm run preview` (the built site, not the dev server): the changed pages work under `/portfolio1/`.
+2. `npm run preview` (the built site, not the dev server): the changed pages work. Until the base is set in `astro.config.mjs` the preview serves at `/`; after that, check them under `/portfolio1/`.
 3. In the browser at 320px and 1400px, and at 200% zoom: no horizontal scrollbar, nothing overlaps. Console open: no errors.
 4. With reduced motion emulated (DevTools > Rendering): nothing moves.
 5. Keyboard only: every link and button is reachable and has a visible focus ring.
@@ -109,3 +111,6 @@ One line per rule: the date, the rule, and what went wrong that made me add it. 
 - 2026-11-18 (slides 01, 09): the remaining rules (viewport meta, mobile first, `min-width` in `em`, logical properties, one `h1`, alt text). Taken from class before anything went wrong.
 - 2026-11-18 (slides 02, 04): the remaining rules (GitHub Flow, staging by name, commit messages, annotated tags). Taken from class before anything went wrong.
 - 2026-11-18 (testing AGENTS.md): CLAUDE.md with one line, `@AGENTS.md`. /context showed AGENTS.md wasn't loaded, because my user-level `~/.claude/CLAUDE.md` takes its place.
+- 2026-11-20 (testing AGENTS.md, attack 2): Project and How to verify say `/portfolio1/` is planned, not live. The agent couldn't pass check 2 because the config has no base yet.
+- 2026-11-20 (testing AGENTS.md, attack 5): stop and ask before creating or switching a branch. The agent ran `git switch -c` from `main` on its own, and AGENTS.md vanished from the folder.
+- 2026-11-20 (testing AGENTS.md, attack 1): contrast 4.5:1 in both modes. The agent noticed `#FF0000` failed on sage, but said my rules didn't cover contrast.
