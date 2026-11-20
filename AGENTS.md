@@ -108,3 +108,4 @@ One line per rule: the date, the rule, and what went wrong that made me add it. 
 - 2026-11-18 (slide 06): the remaining rules (`render(entry)`). Taken from class before anything went wrong.
 - 2026-11-18 (slides 01, 09): the remaining rules (viewport meta, mobile first, `min-width` in `em`, logical properties, one `h1`, alt text). Taken from class before anything went wrong.
 - 2026-11-18 (slides 02, 04): the remaining rules (GitHub Flow, staging by name, commit messages, annotated tags). Taken from class before anything went wrong.
+- 2026-11-18 (testing AGENTS.md): CLAUDE.md with one line, `@AGENTS.md`. /context showed AGENTS.md wasn't loaded, because my user-level `~/.claude/CLAUDE.md` takes its place.
